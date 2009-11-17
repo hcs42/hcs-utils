@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Lists the programs of hcs-utils.
+
+function print_short_description
+{
+    sed -n ':a;/^ *$/{n;ba}; # eat empty lines
+            /^ *#/{n}; # eat shebang
+            :c;/^ *$/{n;bc}; # eat empty lines
+            :d;/^ *#/{s/^ *# *//g;N;bd}; # print comments
+            s/\n *# */ /g;s/\n//g;p;q' $1
+}
+
+HCS_UTILS_DIR=$(dirname "$0")
+for program in $(ls $HCS_UTILS_DIR)
+do
+    echo -n "$program --- "
+    print_short_description "$HCS_UTILS_DIR/$program"
+done
