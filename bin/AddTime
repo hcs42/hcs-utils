@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Echoes the standard input together with the date/time it was received.
+
+while read line; do echo "[`date +%H:%M:%S`] $line"; done

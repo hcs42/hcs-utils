@@ -1,0 +1,362 @@
+#!/usr/bin/env python3
+
+# Downloads specific podcasts.
+
+import datetime
+import os
+import os.path
+import pickle
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import urllib.request
+
+        
+def weekday_to_datetime(year, week, dayofweek, strf=False):
+    """Creates a datetime object based on year+week+dayofweek.
+    
+    Arguments:
+    - `year` (int)
+    - `week` (int) -- Should be between 1 and 53.
+    - `dayofmonth` (int) -- Should be between 1 (Monday) and 7 (Sunday).
+
+    Returns: datetime.datetime
+    """
+
+    jan1 = datetime.date(year, 1, 1)
+    day_diff = (dayofweek - jan1.isoweekday()) + (week - 1) * 7
+    result = jan1 + datetime.timedelta(days = day_diff)
+    if not strf:
+        return result
+    else:
+        return (result.strftime('%m'), result.strftime('%d'))
+
+##### Variables #####
+
+join = os.path.join
+year = datetime.datetime.today().year
+podcast_dir = '/a/media/audio/flash'
+
+dir_dict = {
+    'news': '1news',
+    'mr': '2mr',
+    'comedy': '3comedy',
+    'bbc': '4bbc',
+    'tn': '5tn',
+    'show': '6show',
+    'comp': '7comp',
+    'etc': '8etc',
+}
+
+dirs = { dir: join(podcast_dir, realdir)
+         for dir, realdir in dir_dict.items() }
+
+
+##### Global functions #####
+
+def gettempfile():
+    desc, tmpfile = tempfile.mkstemp()
+    os.close(desc)
+    return tmpfile
+
+def mkdirp(dir):
+    subprocess.call(['mkdir', '-p', dir])
+
+def gotodir(dir):
+    mkdirp(dir)
+    os.chdir(dir)
+
+def wget(address, output):
+    subprocess.call(['wget', '-c', address, '-O', output])
+
+def weekday(month, day):
+    return datetime.datetime(year, month, day).strftime("%a")
+
+def find_next(dir):
+    max = 0
+    for d in os.listdir(dir):
+        try:
+            i = int(d[0:2])
+            if i > max:
+                max = i
+        except Exception:
+            pass
+    return '{0:02}'.format(max+1)
+
+def mrget(address, file):
+    subprocess.call(['MRGET', address, file])
+
+def mrget2(address, file):
+    for line in str(urllib.request.urlopen(address).read(), encoding='latin2').split('\n'):
+        m = re.search('<a href=" *(.*?) *">[Hh]allgassa meg!</a>', line)
+        if m:
+            real_address = m.group(1)
+            break
+    else:
+        print('No address found.')
+        return
+    mrget(real_address, file)
+
+def reencode_mp3(mp3file):
+    tmpfile = gettempfile()
+    subprocess.call(['mplayer', '-vo', 'null', '-vc', 'null', '-ao', \
+                     'pcm:waveheader:fast:file='+tmpfile, mp3file])
+    subprocess.call(['lame', tmpfile, mp3file])
+
+##### MR news #####
+
+def get_mr1(month, day):
+    gotodir(dirs['news'])
+    hour = '17'
+    basename = '{month}{day}a'.format(month=month, day=day)
+    rm_name = basename+'.rm'
+    mp3_name = '%s %s.mp3' % (basename[0:4], weekday(int(month), int(day)))
+    wav_name = basename+'.wav'
+    wav2_name = basename+'2.wav'
+    address = 'real1.radio.hu/kossuth/{year}/{month}/{day}/' \
+              '{year}-{month}-{day}-k{hour}.rm'. \
+              format(year=year, month=month, day=day, hour=hour, basename=basename)
+    wget(address, rm_name)
+    subprocess.call(['mplayer', '-vo', 'null', '-vc', 'null', '-ao', \
+                     'pcm:waveheader:fast:file='+wav_name, rm_name])
+    subprocess.call(['sox', '-t', 'wav', wav_name, '-t', 'wav', wav2_name, \
+                     'trim', '30:10', '59:00'])
+    subprocess.call(['lame', wav2_name, mp3_name])
+    os.remove(rm_name)
+    os.remove(wav_name)
+    os.remove(wav2_name)
+
+def get_mr1_time(month, day, hour, mp3_name, a=None, b=None):
+    basename = '%s%s%s' % (month, day, hour)
+    rm_name = basename+'.rm'
+    wav_name = basename+'.wav'
+    address = 'real1.radio.hu/kossuth/{year}/{month}/{day}/' \
+              '{year}-{month}-{day}-k{hour}.rm'. \
+              format(year=year, month=month, day=day, hour=hour)
+    wget(address, rm_name)
+    subprocess.call(['mplayer', '-vo', 'null', '-vc', 'null', '-ao', \
+                     'pcm:waveheader:fast:file='+wav_name, rm_name])
+    if a is None:
+        wav2_name = basename+'.wav'
+    else:
+        wav2_name = basename+'2.wav'
+        subprocess.call(['sox', '-t', 'wav', wav_name, '-t', 'wav', wav2_name, \
+                         'trim', a+':10', b+':00'])
+        
+    subprocess.call(['lame', wav2_name, mp3_name])
+    os.remove(rm_name)
+    os.remove(wav_name)
+    if a is not None:
+        os.remove(wav2_name)
+
+def handle_mr_180(a):
+    if len(a) > 1:
+        return False
+    mr_match = re.match(r'p(\d\d)(\d\d)$', a[0])
+    if mr_match == None:
+        return False
+    g = mr_match.group
+    month, day = g(1), g(2)
+
+    mp3base = 'p%s%s%%s.mp3' % (month, day)
+    gotodir(dirs['mr'])
+    get_mr1_time(month, day, '06', mp3base % ('a',))
+    get_mr1_time(month, day, '07', mp3base % ('b',))
+    get_mr1_time(month, day, '08', mp3base % ('c',))
+    return True
+
+def call_cut(mp3name, from_='0:0', to='999:0'):
+    tmpfile = gettempfile()
+    print('Moving %s to %s' % (mp3name,tmpfile))
+    os.rename(mp3name, tmpfile)
+    params = ['cutmp3',
+              '-i', tmpfile,
+              '-a', from_,
+              '-b', to,
+              '-O', mp3name]
+    print('Cutting:', params)
+    subprocess.call(params)
+
+def handle_mr_spec(a):
+    if len(a) != 2:
+        return False
+    mr_match = re.match(r'(\d+)/(\d\d)(/(\d\d)?-(\d\d)?)?$', a[1])
+    if mr_match is None:
+        return False
+
+    g = mr_match.group
+    date, hour, minute_from, minute_to = \
+        g(1), g(2), g(4), g(5)
+
+    if len(date) == 3:
+        g = re.match(r'(\d\d)(\d)$', date).group
+        week, day_of_week = g(1), g(2)
+        month, day = \
+            weekday_to_datetime(year, int(week), int(day_of_week), strf=True)
+    elif len(date) == 4:
+        g = re.match(r'(\d\d)(\d\d)$', date).group
+        month, day = g(1), g(2)
+    else:
+        return False
+
+    if minute_from is None:
+        minute_from = '0'
+    if minute_to is None:
+        minute_to = '60'
+
+    dir = dirs['mr']
+    if a[0][0] == ':':
+        mp3_file = ('%s.mp3' % (a[0][1:],))
+    else:
+        gotodir(dirs['mr'])
+        mp3_file = join(dir, '%s %s.mp3' % (find_next(dir), a[0]))
+    print ('minute_from', minute_from)
+    print ('minute_to', minute_to)
+    print ('mp3_file', mp3_file)
+    get_mr1_time(month, day, hour, mp3_file, minute_from, minute_to)
+    return True
+
+def handle_mr_news(a):
+    if a[0] == 'mr':
+        now = datetime.datetime.now()
+        if now.hour < 18:
+            date = now - datetime.timedelta(days=1)
+        else:
+            date = now
+        month, day = date.month, date.day
+        month = '{0:02}'.format(month)
+        day = '{0:02}'.format(day)
+    else:
+        if len(a) > 1:
+            return False
+        mr_match = re.match(r'(\d\d)(\d\d)$', a[0])
+        if mr_match == None:
+            return False
+        g = mr_match.group
+        month, day = g(1), g(2)
+
+    get_mr1(month, day)
+    return True
+
+def handle_bbc(a):
+    bbc_address = \
+            'http://downloads.bbc.co.uk/podcasts/worldservice/globalnews/globalnews' \
+            '_{year}{month}{day}-{hour}{minute}{ab}.mp3'
+    match = \
+        re.match(bbc_address.format(year=r'\d\d\d\d', month=r'(\d\d)', day=r'(\d\d)', \
+                                    hour='(\d\d)', minute='\d\d', ab='.'), a[0])
+    if match == None:
+        return False
+
+    os.chdir(dirs['news'])
+    g = match.group
+    month, day, hour, address = g(1), g(2), g(3), a[0]
+    ab = 'b' if int(hour) < 12 else 'c'
+    mp3_file = '{0}{1}{2}.mp3'.format(month, day, ab)
+    wget(address, mp3_file)
+    return True
+
+##### Usual podcasts #####
+
+def cut(time):
+    def get(address, mp3file):
+        wget(address, mp3file)
+        subprocess.call(['Cut', mp3file, time])
+    return get
+
+def get_and_reencode(address, mp3file):
+    wget(address, mp3file)
+#    mp3file = '/a/media/audio/flash/6show/26tr 19.mp3'
+    reencode_mp3(mp3file)
+
+podcasts = [
+    ('mr',   '',    mrget,       'http://www.mr1-kossuth.hu/m3u/(.*).m3u'),
+    ('mr',   '',    mrget2,      'http://www.mr1-kossuth.hu/index.php?'),
+    ('bbc',  'sc',  wget,        'http://downloads.bbc.co.uk/podcasts/worldservice/scia'),
+    ('bbc',  'iv',  wget,        'http://downloads.bbc.co.uk/podcasts/worldservice/interview'),
+    ('bbc',  '',    wget,        'http://downloads.bbc.co.uk'),
+    ('tn',   'tn',  wget,        'http://itc.conversationsnetwork.org/audio/premium/hcs42%7Ccsaba.hoch%40gmail.com/ITC.TN.*'),
+    ('show', 'so',  wget,        'http://itc.conversationsnetwork.org/audio/premium/hcs42%7Ccsaba.hoch%40gmail.com/ITC.SO-Episode(.*)'),
+    ('show', 'se',  wget,        'http://media.libsyn.com/media/seradio/seradio-episode(\d\d\d).*mp3'),
+    ('show', 'se',  wget,        'http://feedproxy.google.com/~r/se-radio'),
+    ('show', 'fl',  cut('0:30'), 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/FLOSS-(\d\d\d).mp3'),
+    ('show', 'fl',  cut('0:30'), 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/floss'),
+    ('show', 'lo',  wget,        'http://media.libsyn.com/media/linuxoutlaws/linuxoutlaws(\d\d\d).mp3'),
+    ('show', 'uu',  cut('0:01'), 'http://podcast.ubuntu-uk.org/download/uupc_s(\d\d)e(\d\d)_high.mp3'),
+    ('show', 'sf',  wget,        'http://www.softwarefreedom.org/podcast-media/Software-Freedom-Law-Show'),
+    ('show', 'tr',  get_and_reencode, 'http://www.tuxradar.com/files/podcast/'),
+    ('comp', 'itc', wget,        'http://itc.conversationsnetwork.org'),
+    ('comp', 'itc', wget,        'http://sic.conversationsnetwork.org'),
+    ('etc',  '',    wget,        'http://.*'),
+]
+
+def handle_usual(a):
+    for podcast in podcasts:
+        dir, shortname, getfun, template = podcast
+
+        # Does the podcast match the template?
+        match = re.match(template, a[1])
+        if match == None:
+            continue
+
+        # Getting the file
+        dir = dirs[dir]
+        mkdirp(dir)
+        address = a[1]
+        mp3_file = join(dir, '%s%s %s.mp3' % (find_next(dir), shortname, a[0]))
+        getfun(address, mp3_file)
+        return True
+    return False
+
+def handle_help(a):
+    if a == [] or \
+       (len(a) == 1 and a[0] in ['-h', '--help']):
+        pass
+    else:
+        return False
+
+    help_string = """\
+mr1 news:
+    NG <mmdd>
+mr1 180 perc:
+    NG p<mmdd>
+mr1:
+    NG <mmdd>/<HH>
+    NG <mmdd>/<HH>/<MM><MM>
+    NG <wwd>/<HH>
+    NG <wwd>/<HH>/<MM><MM>
+concrete shows:
+    G7: 6/14/35-
+    IdotKerek: 6/16/04-
+    RV: 6/18/04-30
+    Tetszettek volna: 7/08/30-
+    Kabare: 6/13/05-
+    Matine: 7/09/05-
+bbc news:
+    NG <link>
+other:
+    NG <title> <link>
+"""
+    sys.stdout.write(help_string)
+    return True
+    
+def main(a):
+    if handle_help(a):
+        pass
+    elif handle_mr_news(a):
+        pass
+    elif handle_mr_180(a):
+        pass
+    elif handle_mr_spec(a):
+        pass
+    elif handle_bbc(a):
+        pass
+    elif handle_usual(a):
+        pass
+    else:
+        print("Handler not found.")
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
