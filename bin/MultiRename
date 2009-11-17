@@ -1,0 +1,66 @@
+#!/usr/bin/python
+
+# Renames multiple files in the current directory.
+
+help_text = """\
+NAME
+    MultiRename
+USAGE
+    MultiRename
+DESCRIPTION
+    Renames files in the current directory in the following manner:
+     - it creates a bash script that the user can modify and opens it with gvim
+     - the user modifies the script as he wants to perform the renaming and
+       says :x
+     - the script performs the renaming; i.e. it executes the created bash
+       script
+     The script can be interrupted with CTRL-C from the shell, and after that
+     the gvim can be closed (without saving the file).
+OPTIONS
+    -h, --help  
+        This help
+AUTHOR
+    Csaba Hoch <csaba.hoch@gmail.com>
+"""
+
+
+import re
+import sys
+import os
+import tempfile
+import subprocess
+
+
+w = sys.stdout.write
+
+def quote(s):
+    return '"%s"' % (re.sub('"', '\\"', s))
+
+def print_file(output):
+    l = [quote(d) for d in os.listdir('.')]
+    l.sort()
+    max_len = max([len(d) for d in l])
+    for d in l:
+        output('mv %s %s%s\n' % (d, ' ' * (max_len - len(d)), d))
+
+def main():
+    temp, tempname = tempfile.mkstemp()
+    try:
+        temp = os.fdopen(temp, 'w')
+        print_file(temp.write)
+        temp.close()
+        subprocess.call(['gvim', '-f', tempname])
+        subprocess.call(['bash', tempname])
+    except KeyboardInterrupt:
+        pass
+        os.remove(tempname)
+
+if len(sys.argv) == 2 and sys.argv[1] in ('-h', '--help'):
+    w(help_text)
+    sys.exit(0)
+elif len(sys.argv) == 1:
+    main()
+else:
+    print "Unknown arguments."
+    sys.exit(0)
+
