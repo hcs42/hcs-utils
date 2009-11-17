@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Downloads the English idioms for the current month from
+# learn-english-today.com.
+
+function print_help
+{
+cat <<EOF
+NAME
+    GetEnglishIdioms
+USAGE
+    GetEnglishIdioms
+DESCRIPTION
+    Downloads the English idioms for the current month from
+    learn-english-today.com.
+OPTIONS
+    -h, --help  
+        This help
+AUTHOR
+    Csaba Hoch <csaba.hoch@gmail.com>
+EOF
+}
+
+ENGLISH_IDIOM_DIR=/a/media/text/englishidioms
+
+case $1 in
+    -h|--help)
+        print_help
+        exit
+        ;;
+esac
+
+year=`date '+%y'`
+month=`date '+%m'`
+
+cd "$ENGLISH_IDIOM_DIR"
+for i in `seq 1 31`; do
+    if [ "$i" -lt 10 ]; then j=0$i; else j=$i; fi
+    wget http://www.learn-english-today.com/idioms/$i.htm -O "20$year$month$j.html"
+done 

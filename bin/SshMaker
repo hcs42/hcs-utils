@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Generates an ssh key to a host and uploads it.
+
+function print_help
+{
+cat <<EOF
+NAME
+    SshMaker
+USAGE
+    SshMaker [user@]hostname
+DESCRIPTION
+    Generates an ssh key to a host and uploads it.
+OPTIONS
+    -h, --help  
+        This help
+EXAMPLE
+    SshMaker mike@192.168.0.1
+AUTHOR
+    Csaba Hoch <csaba.hoch@gmail.com>
+EOF
+}
+
+case "$1" in
+    ''|-h|--help)
+        print_help
+        exit
+        ;;
+esac
+
+if [ -e "$HOME/.ssh/id_rsa.pub" ]
+then
+    echo "id_rsa found"
+else
+    echo "genereting id_rsa..."
+    ssh-keygen -t rsa -f "$HOME/.ssh/id_rsa"
+    echo "id_rsa generated"
+fi
+
+echo "connecting to $1"
+cat "$HOME/.ssh/id_rsa.pub" | ssh "$1" 'mkdir -p $HOME/.ssh; cat >> .ssh/authorized_keys2'

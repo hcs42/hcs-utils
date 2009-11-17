@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# Sleeps given minutes or until the given time.
+
+function print_help
+{
+cat <<EOF
+NAME
+    Sleep
+USAGE
+    Sleep minutes
+    Sleep hour:minute
+DESCRIPTION
+    Sleeps given minutes or until the given time. The sleeping time can be
+    relative (minutes) or absolute (hour:minute).
+OPTIONS
+    -h, --help  
+        This help.
+EXAMPLES
+    Sleep 10      # sleeps 10 minutes
+    Sleep 20:14   # sleeps until 20:14 today
+AUTHOR
+    Csaba Hoch <csaba.hoch@gmail.com>
+EOF
+}
+
+# options
+sleepTime=""
+sleepAbsolute=false
+
+# Processing the arguments.
+i=1
+while [ "$#" != "0" ] 
+do
+    if [ "$1" = "-h" -o  "$1" = "--help" ]
+    then
+        print_help
+        exit 0
+    elif [ "$i" = "1"  ]
+    then
+        sleepTime="$1"
+    else
+        echo "Unexpected argument: '$1'"
+        echo "Try \"-h\" for help"
+        exit 1
+    fi
+    shift
+    i=$((i+1))
+done
+
+if [ "$(echo "$sleepTime" | grep -e ":")" = "" ]
+then
+    sleepAbsolute=false
+else
+    sleepAbsolute=true
+fi
+
+if $sleepAbsolute
+then
+    echo "Sleeping until $sleepTime."
+    while true
+    do
+        if [ "$(date '+%H:%M')" = "$sleepTime" ]
+        then
+            break
+        else
+            sleep 1
+        fi
+    done
+else
+    echo "Sleeping $sleepTime minutes."
+    for i in `seq 1 $sleepTime`
+    do
+        sleep 1m
+        echo "$i minute(s) over."
+    done
+fi
+
