@@ -1,1 +1,8 @@
-Small utility programs.
+My Linux utility programs.
+
+The ListHCSUtils program will print a list of all programs with their short
+description. The short description of all program can be found also in their
+first few lines.
+
+All programs can be called with "--help" parameter to print a more verbose
+help.
