@@ -2,4 +2,32 @@
 
 # Echoes the standard input together with the date/time it was received.
 
+function print_help
+{
+cat <<EOF
+NAME
+    AddTime
+USAGE
+    ... | AddTime
+DESCRIPTION
+    Echoes the standard input together with the date/time it was received.
+EXAMPLE
+    $ (echo a; sleep 2; echo b) | AddTime
+    [21:54:59] a
+    [21:55:01] b
+OPTIONS
+    -h, --help  
+        This help
+AUTHOR
+    Csaba Hoch <csaba.hoch@gmail.com>
+EOF
+}
+
+case $1 in
+    -h|--help)
+        print_help
+        exit
+        ;;
+esac
+
 while read line; do echo "[`date +%H:%M:%S`] $line"; done

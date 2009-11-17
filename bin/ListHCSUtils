@@ -2,6 +2,32 @@
 
 # Lists the programs of hcs-utils.
 
+function print_help
+{
+cat <<EOF
+NAME
+    ListHCSUtils
+USAGE
+    ListHCSUtils
+DESCRIPTION
+    Lists the programs of hcs-utils.
+OPTIONS
+    -h, --help  
+        This help
+AUTHOR
+    Csaba Hoch <csaba.hoch@gmail.com>
+EOF
+}
+
+HCS_UTILS_DIR=$(dirname "$0")
+
+case $1 in
+    -h|--help)
+        print_help
+        exit
+        ;;
+esac
+
 function print_short_description
 {
     sed -n ':a;/^ *$/{n;ba}; # eat empty lines
@@ -11,7 +37,6 @@ function print_short_description
             s/\n *# */ /g;s/\n//g;p;q' $1
 }
 
-HCS_UTILS_DIR=$(dirname "$0")
 for program in $(ls $HCS_UTILS_DIR)
 do
     echo -n "$program --- "

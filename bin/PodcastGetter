@@ -2,6 +2,31 @@
 
 # Downloads specific podcasts.
 
+help_string = """\
+PodcastGetter
+
+mr1 news:
+    NG <mmdd>
+mr1 180 perc:
+    NG p<mmdd>
+mr1:
+    NG <mmdd>/<HH>
+    NG <mmdd>/<HH>/<MM><MM>
+    NG <wwd>/<HH>
+    NG <wwd>/<HH>/<MM><MM>
+concrete shows:
+    G7: 6/14/35-
+    IdotKerek: 6/16/04-
+    RV: 6/18/04-30
+    Tetszettek volna: 7/08/30-
+    Kabare: 6/13/05-
+    Matine: 7/09/05-
+bbc news:
+    NG <link>
+other:
+    NG <title> <link>
+"""
+
 import datetime
 import os
 import os.path
@@ -317,28 +342,6 @@ def handle_help(a):
     else:
         return False
 
-    help_string = """\
-mr1 news:
-    NG <mmdd>
-mr1 180 perc:
-    NG p<mmdd>
-mr1:
-    NG <mmdd>/<HH>
-    NG <mmdd>/<HH>/<MM><MM>
-    NG <wwd>/<HH>
-    NG <wwd>/<HH>/<MM><MM>
-concrete shows:
-    G7: 6/14/35-
-    IdotKerek: 6/16/04-
-    RV: 6/18/04-30
-    Tetszettek volna: 7/08/30-
-    Kabare: 6/13/05-
-    Matine: 7/09/05-
-bbc news:
-    NG <link>
-other:
-    NG <title> <link>
-"""
     sys.stdout.write(help_string)
     return True
     
