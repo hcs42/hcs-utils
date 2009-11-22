@@ -1,0 +1,85 @@
+#!/usr/bin/python
+
+# Moves the given files to the trash.
+
+import optparse
+import os
+import re
+import shutil
+import subprocess
+import sys
+
+trashdir = '/a/_/trash'
+
+def get_trashdir(dir):
+    hostname = subprocess.Popen(["hostname"], stdout=subprocess.PIPE).communicate()[0]
+    if hostname.strip() in ('daneelk', 'daneel'):
+        return '/a/_/folders/trash'
+    elif hostname.strip() in ['dorsk', 'dorsu']:
+        if re.match('/media/flash', dir):
+            return '/media/flash/trash'
+        elif re.match('/a/(_|cp|petra)', dir):
+            return '/a/_/folders/trash'
+        elif re.match('/a/links/fat', dir):
+            return '/a/links/fat/_/trash'
+        else:
+            return None
+
+class HCSExc:
+    def __init__(self,message):
+        self.message = message
+    def __str__(self):
+        return self.message
+
+def move_to_trash(file):
+    if not os.path.exists(file):
+        raise HCSExc('file "%s" does not exist' % (file,))
+    basename = os.path.basename(file)
+    abspath = os.path.abspath(file)
+    newbasename = basename
+    postfix = 0
+    trashdir = get_trashdir(abspath)
+    if trashdir == None:
+        raise HCSExc('there is no trashdir for "%s"' % abspath)
+    while os.path.exists(os.path.join(trashdir,newbasename)):
+        postfix += 1
+        newbasename = basename+'_'+str(postfix)
+    shutil.move(file,os.path.join(trashdir,newbasename))
+
+def parse_args():
+    parser = optparse.OptionParser()
+
+    parser.add_option('--info', dest='info',
+                      help='Trash information.',
+                      action='store_true', default=False)
+    parser.add_option('--show-trashdir', dest='show_trashdir',
+                      help='Shows the trash directory for the current '
+                           'directory.',
+                      action='store_true', default=False)
+
+    (cmdl_options, args) = parser.parse_args()
+    return cmdl_options, args
+
+def main(options, args):
+
+    if options.info:
+        sys.stdout.write('Size of trash in kilobytes: ')
+        sys.stdout.flush()
+        os.system('du -sk '+trashdir+' | cut -f1')
+        return
+    elif options.show_trashdir:
+        print get_trashdir(os.getcwd())
+        return
+
+    w = sys.stdout.write
+    if len(sys.argv) == 1:
+        w('Error: no file given.\n')
+    else:
+        for arg in args:
+            try:
+                move_to_trash(arg)
+            except HCSExc, e:
+                w('Error: '+str(e)+'\n')
+
+if __name__ == '__main__':
+    main(*parse_args())
