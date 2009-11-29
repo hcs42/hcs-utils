@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Downloads all interesting radio programs from radio Kossuth on the given
+# Downloads all interesting radio programmes from radio Kossuth on the given
 # week.
 
 function print_help
@@ -9,15 +9,18 @@ cat <<EOF
 NAME
     MrWeekly
 USAGE
-    MrWeekly <week>
+    MrWeekly [options]
 DESCRIPTION
-    Downloads all interesting radio programs from radio Kossuth on the given
+    Downloads all interesting radio programmes from radio Kossuth on the given
     week.
 OPTIONS
     -h, --help  
         This help
+    --week <week>
+        Download programmes for the given week.
 EXAMPLE
-    MrWeekly 43 # download radio programs for week 43
+    MrWeekly
+    MrWeekly --week 43
 AUTHOR
     Csaba Hoch <csaba.hoch@gmail.com>
 EOF
@@ -25,18 +28,50 @@ EOF
 
 KABARE_DIR="$Rk"
 
-case "$1" in
-    ''|-h|--help)
-        print_help
-        exit
-        ;;
-esac
+while [ "$1" != "" ]
+do
+    case "$1" in
+        -h|--help)
+            print_help
+            exit
+            ;;
+        --week)
+            requested_week="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown argument: $1"
+            exit 1
+            ;;
+    esac
+done
+
+if [ "$requested_week" = "" ]
+then
+    # The following Python 2 code calculates the week for which it is the most
+    # sensible to download the radio programmes. If we are in or before weekday
+    # 4 (Thursday), we will download the programmes for the previous week.
+    # Otherwise we download the programmes for the current week.
+    requested_week=$((
+cat << EOF
+import datetime
+d = datetime.date.today()
+thisweek = int(d.strftime('%W')) + 1
+if d.isoweekday() <= 4:
+    print thisweek-1
+else:
+    print thisweek
+EOF
+) | python)
+fi
+
+echo "Requested week: week ${requested_week}"
 
 set -x
-PodcastGetter "G7 $1" "$1"6/14/35-
-PodcastGetter "IK $1" "$1"6/16/04-
-PodcastGetter "RV $1" "$1"6/18/04-30
-PodcastGetter "TV $1" "$1"7/08/30-
+PodcastGetter "G7 ${requested_week}" "${requested_week}"6/14/35-
+PodcastGetter "IK ${requested_week}" "${requested_week}"6/16/04-
+PodcastGetter "RV ${requested_week}" "${requested_week}"6/18/04-30
+PodcastGetter "TV ${requested_week}" "${requested_week}"7/08/30-
 cd "$KABARE_DIR"
-PodcastGetter ":kabare_$1" "$1"6/13/05- 
-PodcastGetter ":matine_$1" "$1"7/09/05-
+PodcastGetter ":kabare_${requested_week}" "${requested_week}"6/13/05- 
+#PodcastGetter ":matine_${requested_week}" "${requested_week}"7/09/05-
