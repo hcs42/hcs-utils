@@ -1,0 +1,346 @@
+#!/usr/bin/env python3
+
+# Plays the videos in that playlist and can remember where it was stopped.
+
+from __future__ import with_statement
+import sys
+import os
+import os.path
+import re
+from hcs_args3 import args_to_od
+from subprocess import call, PIPE
+
+##### help
+
+help_main = """\
+NAME
+    Video
+USAGE
+    Video command [options]
+DESCRIPTION
+    The program can create a playlist and play the tracks the playlist
+    contains. When playback is stopped, the user can tell the program at which
+    point of time was the track stopped. When the program is called the next
+    time, it will start at that point of that file.
+COMMANDS
+    h, help, -h, --help [topic]:
+        Print the help of the given topic. The default topic is 'main', which
+        gives this help. See other topics later.
+    p, play:
+        Play the playlist.
+    a, add:
+        Add files to the playlist.
+    l, list:
+        Lists the playlist. Same as the following:
+        Video play --commandline --commands "print-playlist b"
+OPTIONS
+  Options of 'play':
+    -h, --hide-mplayer-output
+        Hide mplayer's output.
+    -g, --getch
+        Use getch() when asking for instructions instead of readline().
+    -c, --commandline
+        Start in command line.
+    -C, --commands _commands_
+        Run _commands_.
+    -s, --start-position _position_
+        Start at _position_ instead of the beginning of the file.
+    -*, --experimental
+        Start experimental mode.
+  Options of 'add':
+    -p, --pattern _pattern_
+        The files which match this pattern will be add to the file list.
+        _pattern_ is a Python regular expression.
+        The default is '\\.(mp3|avi|mpeg|mpg)'
+EXAMPLES
+    Initializing the contents of the directory for playing:
+        Video add
+    Start playing with getch():
+        Video play -g
+DETAILS
+    Two files will be created in the current directory.
+    The file plist contains the list of the video files.
+    The file pnum contains the number of the video file which has to be played 
+    next.
+    The file ppos is created when a position is stored (it stored the
+    position).
+    If there is a file called 'donotstop', it will not stop to show the console.
+HELP TOPICS
+    main
+        This help.
+    command-line
+        The description of command line commands.
+AUTHOR
+    Csaba Hoch <csaba.hoch@gmail.com>"""
+
+help_cmd = """\
+Atomic commands:
+    h: this help
+    b: break (exit)
+    <: go to previous track
+    >: go to next track
+    play: play current track
+    pos: save position
+    delpos: delete position
+    l: list tracks
+    g, getch: toggle getch
+    r: refresh playlist
+    print-playlist: prints the playlist
+Compound commands:
+    <cr>, next: >+play+delpos: go to next track & play
+    s: >+b+delpos: go to next track & exit
+    p: pos+b: save position & exit"""
+
+def print_help(topic):
+    if topic == 'main':
+        print(help_main)
+    elif topic == 'command-line':
+        print(help_cmd)
+    else:
+        raise Exception('Unknown help topic: {0}'.format(topic))
+
+##### getch
+
+class _Getch:
+    """Gets a single character from standard input.  Does not echo to the
+    screen."""
+    def __init__(self):
+        try:
+            self.impl = _GetchWindows()
+        except ImportError:
+            self.impl = _GetchUnix()
+
+    def __call__(self): return self.impl()
+
+class _GetchUnix:
+    def __init__(self):
+        import tty, sys
+
+    def __call__(self):
+        import sys, tty, termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+
+class _GetchWindows:
+    def __init__(self):
+        import msvcrt
+
+    def __call__(self):
+        import msvcrt
+        return msvcrt.getch()
+
+getch = _Getch()
+
+##### files
+
+### general
+
+def file_to_string(file_name):
+    f = open(file_name)
+    s = f.read()
+    f.close()
+    return s
+
+def string_to_file(s,file_name):
+    f = open(file_name,'w')
+    f.write(s)
+    f.close()
+
+### pnum
+
+def add_pnum(n):
+    string_to_file(str(max(int(file_to_string('pnum'))+n,1)),'pnum')
+
+def read_pnum():
+    return int(file_to_string('pnum'))
+
+### playlist
+
+def read_playlist():
+    if os.path.exists('plist'):
+        l = []
+        f = open('plist')
+        for line in f:
+            if line.strip() != '':
+                l.append(line[0:-1])
+        f.close()
+        return l
+    else:
+        raise Exception('There is no playlist.')
+
+def get_track(playlist):
+    playnum = read_pnum()
+    if playnum > len(playlist):
+        return None, None
+    else:
+        track = playlist[playnum-1]
+        return playnum, track
+
+def print_playlist():
+    playlist = read_playlist()
+    pnum = read_pnum()
+    i = 1
+    for filename in playlist:
+        arrows = (['--> ',' <--'] if pnum == i else ['    ', ''])
+        print('{0}{1}{2}'.format(arrows[0], filename, arrows[1]))
+        i += 1
+
+### ppos
+
+def write_ppos():
+    sys.stdout.write('Type position (mm:ss): ')
+    sys.stdout.flush()
+    time = sys.stdin.readline()
+    string_to_file(time,'ppos')
+
+def read_ppos():
+    if os.path.isfile('ppos'):
+        return file_to_string('ppos').strip()
+    else:
+        return None
+
+def del_ppos():
+    if os.path.isfile('ppos'):
+        os.remove('ppos')
+
+##### user action functions
+
+def play(od):
+    state = 'getch' if od["commandline"] else 'play'
+    playlist = read_playlist()
+    use_getch = od['getch']
+    command_queue = od['commands'].strip().split(' ')
+    start_pos = od['start-position'] 
+    if command_queue == ['']:
+        command_queue = []
+    while state != 'finished':
+        if state == 'play':
+            pos = read_ppos()
+            playnum, track = get_track(playlist)
+            if playnum == None:
+                sys.stdout.write('Playlist is finished.\n')
+            else:
+                sys.stdout.write('<<< {0}: {1} >>>\n'.format(playnum, track))
+                # -vo x11, - ao alsa?
+                options = ['-fs']
+                if pos:
+                    options += ['-ss',pos]
+                elif start_pos != 0:
+                    options += ['-ss',start_pos]
+                if od['hide-mplayer-output']:
+                    call(['MP']+options+[track],
+                         stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w'))
+                else:
+                    call(['MP']+options+[track])
+            if os.path.exists('donotstop') and playnum != None:
+                add_pnum(1)
+                del_ppos()
+            else:
+                state = 'getch'
+        elif state == 'getch':
+            # getting command
+            if command_queue != []:
+                inp = command_queue.pop(0)
+            elif use_getch:
+                sys.stdout.write("Press a key! ('h' for help) >> ")
+                sys.stdout.flush()
+                inp = getch()
+                sys.stdout.write(inp+'\n')
+                if inp == '\r':
+                    inp = ''
+            else:
+                sys.stdout.write("Type a command! ('h' for help) >> ")
+                sys.stdout.flush()
+                inp = sys.stdin.readline().strip()
+
+            # executing command
+            if inp in ['h','help','?']:
+                print_help('command-line')
+            elif inp == 'b':
+                state = 'finished'
+            elif inp == '<':
+                add_pnum(-1)
+                playnum, track = get_track(playlist)
+                sys.stdout.write('{0}\n'.format(track))
+            elif inp == '>':
+                add_pnum(1)
+                playnum, track = get_track(playlist)
+                sys.stdout.write('{0}\n'.format(track))
+            elif inp == 'play':
+                state = 'play'
+            elif inp == 'pos':
+                write_ppos()
+            elif inp == 'delpos':
+                del_ppos()
+            elif inp == 'l':
+                playnum, track = get_track(playlist)
+                sys.stdout.write('{0}\n'.format(track))
+            elif inp in ['g','getch']:
+                use_getch = not use_getch
+            elif inp in ['','next']:
+                add_pnum(1)
+                del_ppos()
+                state = 'play'
+            elif inp == 's':
+                add_pnum(1)
+                del_ppos()
+                state = 'finished'
+            elif inp == 'p':
+                write_ppos()
+                state = 'finished'
+            elif inp == 'r':
+                playlist = read_playlist()
+            elif inp == 'print-playlist':
+                print_playlist()
+            else:
+                sys.stdout.write("Unknown command: '{0}'\n".format(inp))
+
+def add_to_playlist(od):
+    playlist = set(read_playlist() if os.path.exists('plist') else [])
+    pattern = od['pattern']
+    filenames = []
+    for filename in os.listdir('.'):
+        if re.match(pattern, filename) and (filename not in playlist):
+            filenames.append(filename)
+    filenames.sort()
+    with open('plist','a') as plist_file:
+        for filename in filenames:
+            plist_file.write(filename+'\n')
+            sys.stdout.write("File '{0}' added to the playlist.\n".format(filename))
+    if not os.path.exists('pnum'):
+        string_to_file('1','pnum')
+
+def main(args):
+    cmd = ('help' if len(args) == 0 else args.pop(0))
+    if cmd in ['help','h','--help','-h']:
+        print_help('main' if len(args) == 0 else args.pop(0))
+        return
+    elif cmd in ['play','p']:
+        opt_spec = [['hide-mplayer-output','h',0],
+                    ['getch','g',0],
+                    ['commandline','c',0],
+                    ['commands','C',1,''],
+                    ['start-position','s',1,0],
+                    ['experimental','*',0]]
+        od = args_to_od(args, opt_spec)
+        (play_exp if od['experimental'] else play)(od)
+    elif cmd in ['a','add']:
+        opt_spec = [['pattern','p',1,'.*\\.(mp3|avi|mpeg|mpg)']]
+        od = args_to_od(args, opt_spec)
+        add_to_playlist(od)
+    elif cmd in ['l','list']:
+        main(['play','--commandline','--commands','print-playlist b'])
+    else:
+        raise Exception("Unknown command: '{0}'".format(cmd))
+
+if __name__ == '__main__':
+    try:
+        main(sys.argv[1:])
+    except Exception as e:
+        print("Error: {0}".format(e))
