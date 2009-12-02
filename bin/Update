@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Runs "aptitude update && aptitude safe-upgrade".
+
+function print_help()
+{
+cat <<EOF
+NAME
+    Update
+USAGE
+    Update
+DESCRIPTION
+    Runs "aptitude update && aptitude safe-upgrade". Their output is logged
+    into /var/log/apt-updates. If the current user is not root, it uses sudo to
+    became a root.
+OPTIONS
+    -h, --help  
+        This help
+AUTHOR
+    Csaba Hoch <csaba.hoch@gmail.com>
+EOF
+}
+
+function go_old()
+# Installs only security updates; not used.
+{
+    echo "**************" >> /var/log/apt-security-updates
+    date >> /var/log/apt-security-updates
+    aptitude update 2>&1 | tee -a /var/log/apt-security-updates
+    aptitude safe-upgrade -o Aptitude::Delete-Unused=false --assume-yes --target-release `lsb_release -cs`-security 2>&1 | tee -a /var/log/apt-security-updates
+    echo "Security updates (if any) installed"
+}
+
+function go()
+{
+    echo "**************" >> /var/log/apt-updates
+    date >> /var/log/apt-updates
+    aptitude update 2>&1 | tee -a /var/log/apt-updates
+    aptitude safe-upgrade --assume-yes 2>&1 | tee -a /var/log/apt-updates
+    echo "Updates (if any) installed"
+}
+
+case "$1" in
+    -h|--help)
+        print_help
+        ;;
+    '')
+        sudo "$0" go
+        ;;
+    go)
+        go
+        ;;
+esac
