@@ -1,0 +1,83 @@
+#!/usr/bin/python
+
+# Mounts/umounts the flash drive.
+
+import sys
+from time import sleep
+from subprocess import Popen, PIPE
+
+help_text = """\
+NAME
+    FlashMount
+USAGE
+    FlashMount mount
+    FlashMount umount
+DESCRIPTION
+    Mounts or umounts /media/flash. (The directory /media/flash should exist
+    and /etc/fstab should contain an entry about /media/flash.) Mounting is
+    retried 20 times, once in each second.
+AUTHOR
+    Csaba Hoch <csaba.hoch@gmail.com>
+"""
+
+def write(s):
+    sys.stdout.write(s)
+    sys.stdout.flush()
+
+def main(argv):
+
+    if len(argv) == 0:
+        print "No command given."
+        sys.exit(1)
+
+    command = argv.pop(0)
+    if command in ['-h', '--help']:
+        write(help_text)
+        return
+    elif command == 'mount':
+        finished = False
+        put_newline = False
+        i = 0
+        while not finished:
+            output_list = Popen(['mount','/media/flash'], stdout=PIPE, stderr=PIPE).communicate()
+            output_str = output_list[0] + output_list[1]
+            #if output_str == '':
+            #    finished = True
+            #    print 'Device mounted at /media/flash.'
+            #elif i < 10:
+            #    if i == 0:
+            #        write('Searching..')
+            #    write('.')
+            #    sleep(1)
+            #    put_newline = True
+            #    i += 1
+            #else:
+            #    write("\nNo device found.\n")
+            #    put_newline = False
+            #    finished = True
+            if output_str == '':
+                finished = True
+                print 'Device mounted at /media/flash.'
+                print "Don't forget to umount!"
+            else:
+                write(output_str)
+                if i < 20:
+                    sleep(1)
+                    i += 1
+                else:
+                    write("No device found.\n")
+                    finished = True
+    elif command == 'umount':
+        output_list = Popen(['umount','/media/flash'], stdout=PIPE, stderr=PIPE).communicate()
+        output_str = output_list[0] + output_list[1]
+        if output_str == '':
+            print "Device unmounted."
+        else:
+            write(output_str)
+    else:
+        print "Unknown command: '%s'" % command
+
+try:
+    main(sys.argv[1:])
+except KeyboardInterrupt:
+    pass
