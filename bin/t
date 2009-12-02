@@ -34,6 +34,12 @@ class HCSExc:
 def move_to_trash(file):
     if not os.path.exists(file):
         raise HCSExc('file "%s" does not exist' % (file,))
+
+    # If the file contains a / at the end, it should be removed, otherwise
+    # os.path.basename will return an empty string.
+    if file[-1] == '/':
+        file = file[:-1]
+
     basename = os.path.basename(file)
     abspath = os.path.abspath(file)
     newbasename = basename
