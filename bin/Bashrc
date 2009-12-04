@@ -2,12 +2,40 @@
 
 # local stuff
 
-export PATH="/a/cp/margitka:$PATH"
-export dorsk="hcs@192.168.0.11"
+export PATH=\
+"/a/cp/margitka:"\
+"/a/cp/hcs-utils/bin:"\
+"/a/cp/python/bin:"\
+"/a/cp/bash/bin:"\
+"/a/comp/programs/bin:"\
+"$PATH"
+
+export dors="hcs@192.168.1.102"
+export dorsk="hcs@192.168.1.102"
+export dorsu="hcs@192.168.1.102"
+export daneelk="hcs@192.168.1.100"
+export daneelk="hcs@192.168.1.100"
+
+export PYTHONPATH=".:/a/cp/python/lib"
+
+if [ -e /a/comp/programs/vim/vim_runtime ]; then
+    export VIMRUNTIME=/a/comp/programs/vim/vim_runtime
+fi
+
+if [ "`hostname`" = "daneelk" -o  "`hostname`" = "daneel" ]
+then
+    comp=daneel
+else
+    comp=dors
+fi
+
+# settings
+
+export EDITOR='gvim -f'
+export HISTFILESIZE=100000
 
 # aliases
 
-export EDITOR='gvim -f'
 alias q=exit
 alias c=clear
 alias CO='./configure'
@@ -22,6 +50,11 @@ alias K='krusader --left . >/dev/null 2>/dev/null &'
 alias ll='ls -lA'
 alias cp="cp -i"
 alias mv="mv -i"
+alias GQ="gqview 1>/dev/null 2>/dev/null &"
+alias poweroff_daneel='(ssh $daneel /usr/bin/shutdown -h now) &'
+alias poweroff_dors='(ssh $dors /usr/bin/shutdown -h now) &'
+alias poweroff_this='sudo poweroff'
+
 
 alias n='PodcastGetter'
 
@@ -260,3 +293,273 @@ function grep_acc
 {
     grep "$@" "^[][(){}@#,+$~'\"[:space:]=./_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-]*$"
 }
+
+
+##### unison #####
+
+function hcs_unison
+    # $1: profile name
+    # $2: address of other machine
+{
+    cd /a
+    prf="$HOME/.unison/temp.prf"
+    echo 'root = /a' > "$prf"
+    if [ $comp = "daneel" ]
+    then
+        echo "root = ssh://$dors/a" >> "$prf"
+    else
+        echo "root = ssh://$daneel/a" >> "$prf"
+    fi
+
+    echo >>"$prf"
+
+    cat "/a/comp/folders/unison/$1.prf_" >> "$prf"
+
+    echo "Using ~/.unison/temp.prf"
+    echo unison -auto temp
+    unison -auto temp
+}
+
+function UC
+{
+    hcs_unison cp $1
+}
+
+function UD
+{
+    hcs_unison docs $1
+}
+
+function UP
+{
+    hcs_unison petra1 $1
+}
+
+alias UE="gvim /a/comp/folders/unison/{docs,cp,petra1}.prf_"
+
+##### hcshelp #####
+
+alias H=Help
+alias HE=Helpedit
+alias HL=Helplist
+
+function get_help_file
+{
+    dir="/a/docs/hcs/comp/hcs_help"
+    if [ -e "$dir/$1.txt" ]; then
+        echo "$dir/$1.txt"
+    elif [ -e "$dir/$1.htxt" -o "$2" = "anyway" ]; then
+        echo "$dir/$1.htxt"
+    fi
+}
+
+function Help
+{
+    if [ "$1" = "" ]; then
+        cat "/a/docs/hcs/comp/hcs_help/help.txt"
+    else
+        help_file=`get_help_file "$1" 0`
+        if [ "$help_file" = "" ]; then
+            echo "Subject '$1' does not exist."
+        else
+            cat "$help_file"
+        fi
+    fi
+}
+
+function Helpecho
+{
+    help_file=`get_help_file "$1" anyway`
+    if [ "$help_file" != "" ]; then
+        echo "$help_file"
+    fi
+}
+
+function Helpedit
+{
+    help_file=`get_help_file "$1" anyway`
+    if [ "$help_file" = "" ]; then
+        echo "Subject '$1' does not exist."
+    else
+        gvim "$help_file"
+    fi
+}
+
+function Helplist
+{
+    ls "/a/docs/hcs/comp/hcs_help" | sed 's/\.htxt//g' | sed 's/\.txt//g'
+}
+
+##### hcs dirs #####
+
+function DirDef
+{
+    eval export $1="\"$2\""
+    alias -- $1-="cd \"$2\""
+    alias -- $1--="cd \"$2\"; pwd; ls"
+}
+
+dirs_txt="/a/docs/hcs/comp/hcs_help/dirs.txt"
+
+if [ -f "$dirs_txt" ]; then
+    . /a/docs/hcs/comp/hcs_help/dirs.txt
+fi
+
+alias -- "Fp--"="cd /a/media/audio/flash; pwd; ls {1..8}*"
+alias -- "--"=d
+
+##### Heapkeeper #####
+
+function Hk
+{
+    Hk-
+    alias T='./test.py'
+}
+
+##### clipboard #####
+
+# putting the argument to the clipboard
+function C()
+{
+    case $comp in
+        daneel)
+            #dcop klipper klipper setClipboardContents "$1"
+            dbus-send --type=method_call --dest=org.kde.klipper \
+                 /klipper org.kde.klipper.klipper.setClipboardContents \
+                 string:"$1"
+            ;;
+        *)
+            echo Command is not available.
+            ;;
+    esac
+}
+
+# putting the content of a file to the clipboard
+function Cf()
+{
+    case $comp in
+        daneel)
+            dbus-send --type=method_call --dest=org.kde.klipper \
+                 /klipper org.kde.klipper.klipper.setClipboardContents \
+                 string:"`cat $1`"
+            ;;
+        *)
+            echo Command is not available.
+            ;;
+    esac
+}
+
+# putting the path to the clipboard
+function CP()
+{
+    case $comp in
+        daneel)
+            dbus-send --type=method_call --dest=org.kde.klipper \
+                 /klipper org.kde.klipper.klipper.setClipboardContents \
+                 string:"`pwd`"
+            ;;
+        *)
+            echo Command is not available.
+            ;;
+    esac
+}
+
+##### editing bashrc #####
+
+function EB()
+{
+    gvim -f /a/cp/bash/bashrc
+    . ~/.bashrc
+}
+
+function EBL()
+{
+    gvim -f /a/cp/bash/bashrc_linux
+    . ~/.bashrc
+}
+
+function EBH()
+{
+    gvim -f /a/cp/bash/bashrc_`hostname`
+    . ~/.bashrc
+}
+
+##### aliases #####
+
+alias If=/sbin/ifconfig
+alias IF="/sbin/ifconfig | grep 192.168.1.10"
+alias U="unison -auto d"
+alias MNT_vali="sshfs hoch@vali.inf.elte.hu:/ /a/x/vali"
+alias UMNT_vali="fusermount -u /a/x/vali"
+alias MNT_doc2="sshfs hoch@doc2.inf.elte.hu:/home /a/x/doc2 && cd /a/x/doc2"
+alias UMNT_doc2="fusermount -u /a/x/doc2"
+alias MNT_shrek="sshfs -o workaround=rename attish@shrek.unideb.hu:/home/attish/public_html/heap /a/x/shrek"
+alias UMNT_shrek="fusermount -u /a/x/shrek && cd /a/x/shrek"
+alias TEA="SLEEP 2 && SOUND"
+alias WP="WaitProcess -n"
+alias V="Video -g"
+alias VNC="vncviewer 192.168.0.3:3"
+Shrek="attish@shrek.unideb.hu"
+alias FAH="cd /a/comp/programs/fah; ./fah6"
+alias ssh="ssh -X"
+alias MNT_daneel="sshfs hcs@192.168.1.100:/ /a/links/daneel"
+
+##### Default programs #####
+
+case $comp in
+
+    dors)
+
+        function DVI
+        {
+            kdvi "$1" >/dev/null 2>/dev/null &
+        }
+
+        function PDF
+        {
+            evince "$1" >/dev/null 2>/dev/null &
+        }
+
+        function PS
+        {
+            kghostview "$1" >/dev/null 2>/dev/null &
+        }
+
+        alias mp="mplayer -vo x11"
+        ;;
+esac
+
+##### synchronization #####
+
+function hcs_sync
+{
+    r="rsync -rulv --size-only"
+    h="h@192.168.0.2"
+    echo "$1 --> $2: $3"
+    $r "$1/$3" "$h:$2"
+    echo "$2 --> $1: $3"
+    $r "$h:$2/$3" "$1"
+}
+
+function SYNC
+{
+    hcs_sync /a/media/audio /cygdrive/i/audio 6_radio
+    hcs_sync /a/media/audio/5_cabaret /cygdrive/i/audio/5_cabaret kabare
+    hcs_sync /a/media/audio/5_cabaret /cygdrive/i/audio/5_cabaret radiokabare_szetvagni
+    hcs_sync /a/media/audio/5_cabaret/standup_comedy /cygdrive/i/audio/5_cabaret/standup_comedy
+    hcs_sync /a/media /cygdrive/g/media books
+    hcs_sync /a/comp/install /cygdrive/g/comp/install windows
+    hcs_sync /a/comp/install /cygdrive/g/comp/install linux
+    hcs_sync /a/comp/install /cygdrive/g/comp/install both
+}
+
+##### Misc #####
+
+# disable CTRL-S suspending the screen
+stty -ixon
+
+used_space=`df / | tail -n 1 | sed 's/.* \([^ ]*\)%.*/\1/g'`
+if [ "$used_space" -gt 95 ]
+then
+    echo -n "$used_space% "
+fi

@@ -135,6 +135,9 @@ def append_to_file(filename, str):
     with open(filename, 'a') as f:
         f.write(str)
 
+def today():
+    return datetime.date.today().strftime('%Y-%m-%d')
+
 ##### MR news #####
 
 def get_mr1(month, day):
@@ -268,6 +271,7 @@ def handle_mr_news(a):
         month, day = g(1), g(2)
 
     get_mr1(month, day)
+    append_to_file(podcast_log, '%s mr%s%s  ' % (today(), month, day))
     return True
 
 def handle_bbc(a):
@@ -338,8 +342,9 @@ def handle_usual(a):
         mkdirp(dir)
         address = a[1]
         mp3_file = join(dir, '%s%s %s.mp3' % (find_next(dir), shortname, a[0]))
-        append_to_file(podcast_log, mp3_file + '  ')
         getfun(address, mp3_file)
+        append_to_file(podcast_log, today() + ' ')
+        append_to_file(podcast_log, mp3_file + '  ')
         return True
     return False
 
