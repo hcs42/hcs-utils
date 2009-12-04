@@ -29,12 +29,77 @@ else
     comp=dors
 fi
 
-# settings
+##### Computer dependent stuff #####
+
+case $comp in
+
+    daneel)
+
+        alias MNT_dors="sshfs hcs@192.168.0.12:/ /a/x/dors"
+        alias UMNT_dors="fusermount -u /a/x/dors"
+        alias Fm="FlashMount mount"
+        alias Fu="FlashMount umount"
+        alias Sf="Sync_flash m"
+
+        function DVI
+        {
+            okular "$1" >/dev/null 2>/dev/null &
+        }
+
+        function PDF
+        {
+            okular "$1" >/dev/null 2>/dev/null &
+        }
+
+        function PS
+        {
+            okular "$1" >/dev/null 2>/dev/null &
+        }
+
+        alias mp="mplayer"
+        alias -- -25="cd /a/media/video/todel/25men; Video p -g"
+
+        function RSync
+        # $1: other rsync options, e.g.:
+        #     --delete --force --size-only --list-only
+        {
+            for i in comp cp docs links media petra
+            do
+                rsync -rulpEt --delete --force $1 /a/$i/ /media/backup/$i/
+            done
+        }
+        ;;
+
+    dors)
+
+        function DVI
+        {
+            kdvi "$1" >/dev/null 2>/dev/null &
+        }
+
+        function PDF
+        {
+            evince "$1" >/dev/null 2>/dev/null &
+        }
+
+        function PS
+        {
+            kghostview "$1" >/dev/null 2>/dev/null &
+        }
+
+        alias mp="mplayer -vo x11"
+        ;;
+esac
+
+##### settings #####
 
 export EDITOR='gvim -f'
 export HISTFILESIZE=100000
 
-# aliases
+# disable CTRL-S suspending the screen
+stty -ixon
+
+##### aliases #####
 
 alias q=exit
 alias c=clear
@@ -54,7 +119,9 @@ alias GQ="gqview 1>/dev/null 2>/dev/null &"
 alias poweroff_daneel='(ssh $daneel /usr/bin/shutdown -h now) &'
 alias poweroff_dors='(ssh $dors /usr/bin/shutdown -h now) &'
 alias poweroff_this='sudo poweroff'
-
+alias ls="ls --color=auto"
+alias R='ls -R'
+alias PR="killall plasma; plasma >/dev/null 2>/dev/null &"
 
 alias n='PodcastGetter'
 
@@ -287,14 +354,6 @@ function note
     echo "$@" >> note
 }
 
-##### misc #####
-
-function grep_acc
-{
-    grep "$@" "^[][(){}@#,+$~'\"[:space:]=./_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-]*$"
-}
-
-
 ##### unison #####
 
 function hcs_unison
@@ -504,59 +563,12 @@ alias FAH="cd /a/comp/programs/fah; ./fah6"
 alias ssh="ssh -X"
 alias MNT_daneel="sshfs hcs@192.168.1.100:/ /a/links/daneel"
 
-##### Default programs #####
-
-case $comp in
-
-    dors)
-
-        function DVI
-        {
-            kdvi "$1" >/dev/null 2>/dev/null &
-        }
-
-        function PDF
-        {
-            evince "$1" >/dev/null 2>/dev/null &
-        }
-
-        function PS
-        {
-            kghostview "$1" >/dev/null 2>/dev/null &
-        }
-
-        alias mp="mplayer -vo x11"
-        ;;
-esac
-
-##### synchronization #####
-
-function hcs_sync
-{
-    r="rsync -rulv --size-only"
-    h="h@192.168.0.2"
-    echo "$1 --> $2: $3"
-    $r "$1/$3" "$h:$2"
-    echo "$2 --> $1: $3"
-    $r "$h:$2/$3" "$1"
-}
-
-function SYNC
-{
-    hcs_sync /a/media/audio /cygdrive/i/audio 6_radio
-    hcs_sync /a/media/audio/5_cabaret /cygdrive/i/audio/5_cabaret kabare
-    hcs_sync /a/media/audio/5_cabaret /cygdrive/i/audio/5_cabaret radiokabare_szetvagni
-    hcs_sync /a/media/audio/5_cabaret/standup_comedy /cygdrive/i/audio/5_cabaret/standup_comedy
-    hcs_sync /a/media /cygdrive/g/media books
-    hcs_sync /a/comp/install /cygdrive/g/comp/install windows
-    hcs_sync /a/comp/install /cygdrive/g/comp/install linux
-    hcs_sync /a/comp/install /cygdrive/g/comp/install both
-}
-
 ##### Misc #####
 
-# disable CTRL-S suspending the screen
-stty -ixon
+function grep_acc
+{
+    grep "$@" "^[][(){}@#,+$~'\"[:space:]=./_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-]*$"
+}
 
 used_space=`df / | tail -n 1 | sed 's/.* \([^ ]*\)%.*/\1/g'`
 if [ "$used_space" -gt 95 ]
