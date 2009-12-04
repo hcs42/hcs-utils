@@ -1,0 +1,229 @@
+" -------- "
+" Settings "
+" -------- "
+
+set backupskip=
+set lazyredraw
+set hidden
+set kp=
+set nostartofline
+set laststatus=2
+
+if version >= 700
+    set statusline=%{expand('%:p:h')}\ %#hcsSLFileName#%t%##\ %h%m\ %L\ %=%#hcsSLBufferNumber#%n%##\ %#hcsSLWindowNumber#%{winnr()}%##%#hcsSLFileName#%##\ %l\ %v
+endif
+
+let g:is_bash = 1
+
+" -------- "
+" Mappings " 
+" -------- "
+
+noremap ,<cr> :%s/<c-v><cr>/<cr>
+noremap <s-PageUp> <c-w><up>
+noremap <s-PageDown> <c-w><down>
+noremap ,vm :so $MYVIMRC<cr>
+imap <c-space> <space><space><space><space>
+vnoremap ,cw :<c-u>%s/<c-r>*/<c-r>*/g<left><left>
+noremap ,c*w :*s/\<<c-r>=expand("<cword>")<cr>\>/<c-r>=expand("<cword>")<cr>/g<left><left>
+cnoremap <c-s> \_s\+
+noremap <c-w>O :WinFullScreen<cr>
+noremap ,m `m
+
+noremap ,d "+d
+noremap ,y "+y
+noremap ,p "+p
+noremap ,P "+P
+noremap ,gp "+gp
+noremap ,gP "+gP
+noremap ,,d "*d
+noremap ,,y "*y
+noremap ,,p "*p
+noremap ,,P "*P
+noremap ,,gp "*gp
+noremap ,,gP "*gP
+
+" Invoking external programs
+command! FollowLink call FollowLink()
+function! FollowLink ()
+  let line = getline (".")
+  let line = matchstr (line, '\%(http://\|https://\|www\.\)[^ ,;\t]*')
+  let line = substitute(line, '#', '\\#', 'g')
+  exec "!/a/cp/bash/bin/FOLLOW_LINK '".line. "'"
+endfunction
+map <Leader>w :call FollowLink()<CR>
+
+command! Krusader silent !krusader --left . &
+command! Konsole silent !konsole &
+
+" --------- "
+" Underline "
+" --------- "
+
+" Underline:
+"   Underlines the current line with the given character.
+" Example:
+"   Type this line:
+"       something
+"   Type the following command while the cursor is on that line:
+"       :call Underline('-')
+"   Now the line has been underlined with '-':
+"       something
+"       ---------
+function! Underline(ch)
+   let len = strlen(substitute(getline("."), ".", "x", "g"))
+   normal o
+   call setline(".",repeat(a:ch, len))
+endfunction
+
+" ,<char><char> underlines the current line with <char>.
+" <char> may be any of the followings: - = ^ " ' :
+noremap ,-- :call Underline('-')<cr>
+noremap ,== :call Underline('=')<cr>
+noremap ,^^ :call Underline('^')<cr>
+noremap ,"" :call Underline('"')<cr>
+noremap ,'' :call Underline("'")<cr>
+noremap ,:: :call Underline(":")<cr>
+
+" --- "
+" HCW "
+" --- "
+
+" HCW:
+"   Sets the horizontal size of the Vim window so that it will be just enough
+"   for `n` columns. If `n` is not given, the default value of 80 is used.
+" Examples:
+"   :HCW      " sets the number of columns to 80
+"   :HCW 70   " sets the number of columns to 70
+function! HCW(...)
+    exec 'set columns=' . ((a:0 == 0 ? 80 : a:1) +
+    \ (&number ? max([&numberwidth, len(line('$')) + 1]) : 0))
+endfunction
+
+command! -nargs=? HCW call HCW(<args>)
+
+" -------------- "
+" ViewOn/ViewOff "
+" -------------- "
+
+" ViewOn/ViewOff:
+"   Turns on and off "view" mode in which the cursor is hidden. In "normal
+"   viewmode", the up and down arrows will scroll the screen.
+" Examples:
+"   :ViewOn   " view mode on
+"   :ViewOff  " view mode off
+function! ViewOn()
+    noremap <down> <c-e>
+    noremap <up> <c-y>
+    highlight Cursor gui=NONE guifg=NONE guibg=NONE
+endfunction
+function! ViewOff()
+    unmap <down>
+    unmap <up>
+    highlight Cursor gui=NONE guifg=bg guibg=fg
+endfunction
+
+function! ViewOn2()
+    highlight Cursor gui=NONE guifg=NONE guibg=NONE
+endfunction
+function! ViewOff2()
+    highlight Cursor gui=NONE guifg=bg guibg=fg
+endfunction
+
+command! ViewOn2 call ViewOn2()
+command! ViewOff2 call ViewOff2()
+command! ViewOn call ViewOn()
+command! ViewOff call ViewOff()
+
+" ----- "
+" HSave "
+" ----- "
+
+" Makes up a temporary file name and saves the file there.
+
+command! HSave w! `tempfile -d /a/_/folders/vimtmp -p vim--`
+
+" ------------ "
+" BufferOpener "
+" ------------ "
+
+" Lists the buffers and opens the selected one.
+
+noremap <a-2> :buffers<BAR>
+           \ let i = input("Buffer number: ")<BAR>
+           \ execute "buffer " . i<CR>
+           "           \execute "execute \"tab drop \".bufname(".i.")"<CR>
+
+" -------------- "
+" ShortTabSearch "
+" -------------- "
+
+function! HMapShortSearch()
+    cnoremap <silent> <cr> <cr>:nohls<cr>:call HMapShortSearchEnd()<cr>
+    cnoremap <silent> <tab> <cr>:nohls<cr>:call HMapShortSearchEnd()<cr>
+    cnoremap <silent> <esc> <c-c>:call HMapShortSearchEnd()<cr>
+endfunction
+
+function! HMapShortSearchEnd()
+    cunmap <cr>
+    cunmap <tab>
+    cunmap <esc>
+endfunction
+
+noremap <tab> :call HMapShortSearch()<cr>/\c
+
+" ----- "
+" nohls "
+" ----- "
+
+command! -range HNohls nohls
+noremap ,ls  :HNohls<cr>
+noremap <silent> <cr> :HNohls<cr>
+
+" --------------------------- "
+" Additions to the MRU plugin "
+" --------------------------- "
+
+function! HMEFunction(name,split)
+    " name: name of a pattern to search
+    " split: is the window needed to be split
+    if a:split == 1
+        split
+    endif
+    MRU
+    if a:name != ''
+        let @/ = a:name
+        exec 'normal /'.a:name."\<cr>"
+    endif
+endfunction
+
+command! -nargs=? MS call HMEFunction("<args>",1)
+command! -nargs=? ME call HMEFunction("<args>",0)
+
+let MRU_Max_Entries = 100
+
+" ----------------------------- "
+" Copying stuff to the keyboard "
+" ----------------------------- "
+
+command! FileNameToClipboard let @+=expand('%:p')
+command! PathToClipboard let @+=expand('%:p:h')
+
+" -------------------------------- "
+" Executing Vim code in the buffer "
+" -------------------------------- "
+
+" ,vv - Executes the visual area
+" ,vl - Executed the current line
+function! HRunVisual(mode) range
+    if a:mode=='n'
+        exec "normal! gvy\"*"
+    else
+        exec "normal! \<esc>"
+    endif
+    @*
+endfunction
+
+vnoremap ,vv :call HRunVisual('v')<cr>
+nnoremap ,vv :call HRunVisual('n')<cr>
+noremap <silent> ,vl yy:@"<cr>
