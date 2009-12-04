@@ -1,0 +1,262 @@
+#!/bin/bash
+
+# local stuff
+
+export PATH="/a/cp/margitka:$PATH"
+export dorsk="hcs@192.168.0.11"
+
+# aliases
+
+export EDITOR='gvim -f'
+alias q=exit
+alias c=clear
+alias CO='./configure'
+alias mak='make'
+alias MCA="make clean && make all"
+alias xb='xset -b'
+alias '..'='cd ..'
+alias '...'='cd ../..'
+alias '....'='cd ../../..'
+alias '.....'='cd ../../../..'
+alias K='krusader --left . >/dev/null 2>/dev/null &'
+alias ll='ls -lA'
+alias cp="cp -i"
+alias mv="mv -i"
+
+alias n='PodcastGetter'
+
+##### Timestat #####
+
+function L
+{
+    echo "[`date '+20%y-%m-%d %H:%M:%S'`]" "$@" >> "/a/cp/hk/hk/hcs/hcslog_`hostname`"
+}
+
+function LE
+{
+    gvim "/a/cp/hk/hk/hcs/hcslog_`hostname`"
+}
+
+function LC
+{
+    (cat /a/cp/hk/hk/hcs/hcslog_daneelk;
+     cat /a/cp/hk/hk/hcs/hcslog_dorsu;
+     cat /a/cp/hk/hk/hcs/hcslog_dorsk) | sort | tail -n 20
+}
+
+function s
+{
+    L stop
+}
+
+function TS
+{
+    DaysSince 2009-08-03
+    Timestat -H --since 2009-08-03 -i python:perl:wave_ "$@"
+}
+
+export ACTIONFILES=/a/cp/hk/hk/hcs/hcslog_dorsu:/a/cp/hk/hk/hcs/hcslog_dorsk:/a/cp/hk/hk/hcs/hcslog_daneelk
+
+##### git #####
+
+alias Gs='git status'
+alias Gco='git checkout'
+alias Gt='gitk --all &'
+alias Gd='PAGER="" git diff'
+alias GD='PAGER="" git diff | gview -'
+alias Gp='git pull'
+alias Gl='git log --color'
+alias G1='Gl -p -n1 --stat'
+
+function Gpu
+# $1: thread to push
+{
+    p="grep XXPUSH *.py *.txt"
+    xxx=`$p 2>/dev/null`
+    if [ "$xxx" = "" ]; then
+        git push origin "$1"
+    else
+        $p 2>/dev/null
+    fi
+}
+
+function Gb
+{
+    if [ "$#" == "0" ]
+    then
+        git branch --color -a | grep -v '^  zz_'
+    else
+        git branch "$@"
+    fi
+}
+
+function GC
+{
+    if [ "$1" = "" ]; then
+        msg='.'
+    else
+        msg="$1"
+    fi
+    git commit -a -m "$msg" | grep -v "^#"
+}
+
+alias Gc="git commit"
+
+function GPU
+# $1: thread to push
+{
+    echo "git pull:"
+    gitpullresult="$(git pull)"
+    echo $gitpullresult
+    if [ "$gitpullresult" = "Already up-to-date." ]; then
+        echo "git push:"
+        Gpu "$1"
+    fi
+}
+
+function Git-rebranch
+{
+    branch=$1
+    git push origin :$branch
+    git push origin $branch
+}
+
+function Gf
+{
+    git remote prune attis
+    git fetch attis
+}
+
+complete -o default -o nospace -F _git_diff Gd
+complete -o default -o nospace -F _git_commit Gc
+complete -o default -o nospace -F _git_branch Gb
+complete -o default -o nospace -F _git_checkout Gco
+complete -o default -o nospace -F _git_log Gl
+complete -o default -o nospace -F _git_push Git-rebranch
+
+##### prompt #####
+
+dollar_symbol="\\$"
+alias P=pwd
+if [ "$UID" != "0" ] # normal user
+then
+    dollar_color='22;31'
+    if [ "$USERNAME" = "hcs" -o "$USERNAME" = "hoch" ]
+    then
+        dollar_symbol='$'
+    fi
+else # root
+    dollar_color='31'
+    dollar_symbol='\\$\\$'
+fi
+
+function p4
+{
+    PS1="\\[\\033[10;0m\\033[1;34m\\]\\u@\\[\\033[1;32m\\]\\h\\[\\033[1;34m\\]:\\W\\[\\033["$dollar_color"m\\]"$dollar_symbol"\\[\\033[0m\\] "
+}
+
+function p3
+{
+    PS1="\\[\\033[10;0m\\033[1;34m\\]\\u@\\[\\033[1;32m\\]\\h\\[\\033[1;34m\\]:\\w\\[\\033["$dollar_color"m\\]"$dollar_symbol"\\[\\033[0m\\] "
+}
+
+function p2
+{
+    PS1="\\[\\033[10;0m\\033[1;34m\\]\\w\\[\\033["$dollar_color"m\\]"$dollar_symbol"\\[\\033[0m\\] "
+}
+
+function p1
+{
+    PS1="\\[\\033[10;0m\\033[1;34m\\]\$(parse_git_branch)\\W\\[\\033[${dollar_color}m\\]$dollar_symbol\\[\\033[0m\\] "
+}
+
+function p0
+{
+    PS1="\\[\\033[10;0m\\033[1;34m\\]\\[\\033["$dollar_color"m\\]"$dollar_symbol"\\[\\033[0m\\] "
+}
+
+function parse_git_branch
+{
+    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
+
+PS1="\w\$(parse_git_branch) $ "
+
+if [ "`hostname`" = "dorsk" -o "`hostname`" = "dorsu"  -o "`hostname`" = "daneelk" ]
+then
+    p1
+else
+    p3
+fi
+
+##### emacs #####
+
+function em 
+{
+    emacs --no-splash "$@" >/dev/null 2>/dev/null &
+}
+
+##### apt #####
+
+function AI
+{
+    sudo apt-get install $*
+}
+
+alias AS='apt-cache search'
+
+function ASG
+{
+    apt-cache search "$1" | gview -
+}
+
+##### directory/file handling #####
+
+function CD
+{
+    mkdir -p "$1"
+    cd "$1"
+}
+
+function LN
+    # $1: link or directory name
+    # $2: target
+{
+    ln -s "$2" "$1"
+}
+
+alias d=". CdLs"
+#function d
+#{
+#    . CdLs "$@"
+#}
+
+##### GW #####
+
+function GW
+{
+    x=`which $1`
+    if [ "$x" = "" ]
+    then
+        echo "no such thing"
+    else
+        gvim "$x"
+    fi
+}
+
+complete -o default -c GW
+
+##### note #####
+
+function note
+{
+    echo Note for `pwd`
+    echo "$@" >> note
+}
+
+##### misc #####
+
+function grep_acc
+{
+    grep "$@" "^[][(){}@#,+$~'\"[:space:]=./_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-]*$"
+}

@@ -1,0 +1,65 @@
+#!/bin/bash
+
+# A combination of "cd" and "ls".
+
+function print_help
+{
+cat <<EOF
+NAME
+    CdLs
+USAGE
+    d
+    d <dirname>
+DESCRIPTION
+    Changes the current directory and list its content. If the directory is no
+    given, it just lists the content of the current directory.
+    
+    Make an alias in the bashrc before using the program:
+
+        alias d=". CdLs"
+
+    Otherwise it should be invoked with '.' from the shell.
+EXAMPLE
+    d /mydir
+OPTIONS
+    -h, --help  
+        This help
+AUTHOR
+    Csaba Hoch <csaba.hoch@gmail.com>
+EOF
+}
+
+cont=true
+case $1 in
+    -h|--help)
+        print_help
+        cont=false
+        ;;
+esac
+
+if $cont
+then
+    if [ "$1" = "" ]
+    then
+        cont=true
+    elif [ ! -e "$1" ]
+    then
+        echo "$1: No such file or directory"
+        cont=false
+    elif [ ! -d "$1" ]
+    then
+        echo "$1 is not a directory"
+        cont=false
+    else
+        cd "$1"
+        if [ "$?" != 0 ]
+        then
+            cont=false
+        fi
+    fi
+fi
+
+if $cont
+then
+    ls --color=auto
+fi
