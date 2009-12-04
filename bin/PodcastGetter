@@ -63,6 +63,7 @@ def weekday_to_datetime(year, week, dayofweek, strf=False):
 join = os.path.join
 year = datetime.datetime.today().year
 podcast_dir = '/a/media/audio/flash'
+podcast_log = '/a/media/audio/podcast_log'
 
 dir_dict = {
     'news': '1news',
@@ -129,6 +130,10 @@ def reencode_mp3(mp3file):
     subprocess.call(['mplayer', '-vo', 'null', '-vc', 'null', '-ao', \
                      'pcm:waveheader:fast:file='+tmpfile, mp3file])
     subprocess.call(['lame', tmpfile, mp3file])
+
+def append_to_file(filename, str):
+    with open(filename, 'a') as f:
+        f.write(str)
 
 ##### MR news #####
 
@@ -312,6 +317,8 @@ podcasts = [
     ('show', 'uu',  cut('0:01'), 'http://podcast.ubuntu-uk.org/download/uupc_s(\d\d)e(\d\d)_high.mp3'),
     ('show', 'sf',  wget,        'http://www.softwarefreedom.org/podcast-media/Software-Freedom-Law-Show'),
     ('show', 'tr',  get_and_reencode, 'http://www.tuxradar.com/files/podcast/'),
+    ('show', 'sj',  wget,        'http://feedproxy.google.com/~r/ShotOfJaq'),
+    ('show', 'sj',  wget,        'http://audio.lugradio.org/shotofjaq'),
     ('comp', 'itc', wget,        'http://itc.conversationsnetwork.org'),
     ('comp', 'itc', wget,        'http://sic.conversationsnetwork.org'),
     ('etc',  '',    wget,        'http://.*'),
@@ -331,6 +338,7 @@ def handle_usual(a):
         mkdirp(dir)
         address = a[1]
         mp3_file = join(dir, '%s%s %s.mp3' % (find_next(dir), shortname, a[0]))
+        append_to_file(podcast_log, mp3_file + '  ')
         getfun(address, mp3_file)
         return True
     return False
@@ -346,6 +354,9 @@ def handle_help(a):
     return True
     
 def main(a):
+
+    handle_not_found_error = False
+
     if handle_help(a):
         pass
     elif handle_mr_news(a):
@@ -359,7 +370,13 @@ def main(a):
     elif handle_usual(a):
         pass
     else:
+        handle_not_found_error = True
+
+    if handle_not_found_error:
         print("Handler not found.")
+    else:
+        s = '  '.join(a) + '\n'
+        append_to_file(podcast_log, s)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
