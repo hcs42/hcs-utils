@@ -1,0 +1,637 @@
+*hcs.txt*        For Vim version 7.0.  Last change: 2007 Oct 10
+
+              HCS REFERENCE MANUAL    by Csaba Hoch
+
+
+                                                        *hcs*
+This is a helpfile for Csaba Hoch's vimrc
+
+I. Functions, commands, mappings        |hcs-fcm|
+    1. Options                          |hcs-options|
+    2. Editing                          |hcs-editing|
+    3. Files, windows, buffers          |hcs-files|
+    4. Running Vim scripts              |hcs-scripts|
+    5. Programming                      |hcs-programming|
+    6. Miscellaneous                    |hcs-misc|
+    7. Meta                             |hcs-meta|
+II. Other subjects                      |hcs-other|
+    1. How the vimrc works              |hcs-vimrc-work|
+    2. Interesting things               |hcs-interesting|
+III. Filetype-specific things           |hcs-ft|
+    Vim-help                            |hcs-ft-vim-help|
+    hcs.txt                             |hcs-ft-hcs.txt|
+    Erlang                              |hcs-erlang|
+    Tex                                 |hcs-tex|
+IV. TODO                                |hcs-todo|
+
+==============================================================================
+I. Functions, commands, mappings                        *hcs-fcm*
+
+The convention is that the filetype-independent mappings start with a comma,
+and the filetype-dependent ones start with a dot.
+
+
+0. Useful functions (needed by the others)              *hcs-useful*
+
+function HFileExists({file})
+                Return 1 if the {file} exists, 0 otherwise.
+
+function HGetFileByName({pseudo-name})
+                Return the filename with full path. {pseudo-name} is like
+                "vimfiles-dir".
+
+                                                        
+1. Options                                              *hcs-options*
+
+map ,nu >
+                :set number!
+map ,ro >
+<               Allow to edit that file, I don't care if it's readonly. >
+                :set noreadonly modifiable
+map ,da >
+                :set background=dark
+map ,li >
+                :set background=light
+map ,wr
+                Do/don't break the line at the end of the window. >
+                :set wrap!
+map ,lb 
+                Do/don't cut the words at the middle at the end of the line. >
+                :set linebreak
+map ,ws >
+                :set wrapscan!
+map ,sp >
+                :set spell spelllang=hu,en
+map ,s! >
+                :set spell!
+map ,l!
+                Do/don't show the tabs, enters etc. >
+                :set list!
+map ,menu
+function HMenuOnOff()
+                Do/don't show the menubar.
+map ,sc
+function HScrollbarOnOff()
+                Do/don't show the menubar.
+
+map ,ti
+function HSetTitleString()
+                Get the new titlestring from the user and set it.
+
+                                                        
+2. Editing                                              *hcs-editing*
+
+
+2.1. Selection~
+
+map ,a
+map ,aa
+                Select the whole text.
+
+map ,a"
+                Copy the whole buffer into the " register.
+
+map ,a+
+map ,a(
+map ,all
+                Copy the whole buffer into the + register.
+
+map ,ad
+                Delete the whole text (to the blackhole register).
+
+map ,a=
+                Indent the whole text.
+
+
+2.2. Search~
+
+map /
+                Start a case-insensitive search.
+
+map - >
+                /
+
+map <cr> >
+map ,ls
+:HNohls
+                Like nohls, but works also in a range.
+
+map ,/W
+map ,-W
+                Start of a word-search.
+
+map ,/w
+map ,-w
+                Start of a case-insensitive word-search.
+
+map ,log
+                Search for logging functions.
+
+[v]map ,*
+                Highlight the word under the cursor or the visual area.
+
+[v]map ,v*
+                Start a vimgrep with the word under the cursor or with the
+                visual area.
+
+map ,hw
+                Search for the word under the cursor in Vim help.
+
+
+2.3. Changing text~
+
+map ,cw
+                Change all occurancies of the word under the cursor. 
+
+                                                        
+3. Files, windows, buffers                              *hcs-files*
+
+
+3.1. Jumping to files~
+
+:HE {file}
+function HGotoFile({file})
+                Jump to the {file}. 
+                If it is in the arglist, then go there.
+                It means, that the :next and :prev command will work
+                "correctly"; consider the following example: >
+                    vim f1 f2 f3  
+                    " now editing f1
+                    :call HGotoFile('f3')
+                    " editing f3
+                    :prev
+                    " now you will get f2!
+
+map gh
+map ,g
+function HGotoFileAtCursor()
+                Jump to the filename under the cursor.
+                Invokes HGotoFile() with the filename under the cursor.
+
+map ,-g
+function HGotoFileLine()
+                Try to follow the WORD under the cursor as a link.
+                The WORD may be:
+                - filename
+                - [filename]:linenumber (filename is optional)
+                - [filename]:label      (filename is optional)
+
+
+3.2. Jumping to special files~
+
+function HDefineJumpToFile({file},{keyseq},{mapargs})
+                Define the following mappings:
+
+map {mapargs} ,s{keyseq}
+                Edit the {file} in a new window.
+
+map {mapargs} ,e{keyseq}
+                Edit the {file} in the current window.
+
+function HDefineJumpToTheFirstExistingFile({file-list},{keyseq},{mapargs})
+                Define the previous mapping the the first existing file in the
+                {file-list}.
+
+
+There are a few predefined files:
+
+keyseq  file
+----------------------------------------------------
+v       vimrc
+h       hcs.txt (hcs-help)
+t       hcs-todo in hcs.txt
+s       the syntax file of the current filetype
+i       the indent file of the current filetype
+p       the ftplugin file of the current filetype
+----------------------------------------------------
+
+
+3.3. Windows~
+
+:VS
+function VS()
+                Create a window left from the current one, and set the width
+                of the current window to 80.
+
+:VC
+function VC()
+                Close that window.
+
+
+3.4. Save, quit~
+
+:Q >
+                :Q
+map Q >
+                :xa
+map !Q >
+                :qa!
+
+map <c-s>
+:W
+                Same as :w
+
+:WQ
+                Same as :exit
+
+
+3.3. Miscellaneous~
+
+function HCurrentFile()
+                The name of the current file with full path.
+
+                                                        
+4. Running Vim scripts                                  *hcs-scripts*
+
+function HRunFileIfExists({file})
+                Run the {file} (as a vimscript), if it exists.
+
+map ,vir
+                The buffer should contain this line: >
+                    ---vim---
+<               This commmand will run all command below that line.
+
+map ,vlr        
+                Run the current line as a Vim script.
+
+                                                        
+5. Programming                                          *hcs-programming*
+
+
+5.1. Editing~
+
+:HT
+function HTemplate()
+                Insert a template depending on the current filetype.
+                E.g. the Java template is: >
+        
+                    public class Main {
+                        public static void main(String args[]) {
+                            System.out.println("hello");
+                        }
+                    }
+
+HMap_Alt_Comments({comment})
+                Define the following 5 mappings.
+
+imap <a-down>
+                Insert a {comment} and go to the next line.
+
+imap <a-up>
+                Insert a {comment} and go to the previous line.
+
+imap <c-a-down>
+                Delete a {comment} and go to the next line.
+                (The cursor should be before a comment.)
+
+imap <c-a-up>
+                Delete a {comment} and go to the previous line.
+                (The cursor should be before a comment.)
+map Y 
+                The current line should be a line containing:
+                - one comment
+                - one space
+                - text.
+                This command will yank the text into the + register.
+
+function HCommentMacro({str},{level})
+                TODO
+
+function HCComment()
+                TODO
+
+function HCUnComment()
+                TODO
+
+
+5.1.1. HCS completion~
+
+There is global list, which contains tranformation rules on lines
+(g:hrule_list). 
+A rule is a list:
+    [{ft-pattern}, {pattern}, {expr}, {todoafter}, {flags}]
+The meaning of a rule:
+    "If the filetype matches {ft-pattern} and the current line matches
+    {pattern}, then do a .s/{pattern}/{expr} substitution, and after that do
+    the {todoafter}".
+Flags:
+    =       Do an =-command on the lines.
+
+I use extended patterns (epatterns), which can be converted easily (with the
+HPatternEx function) to Vim patterns.
+
+    epattern   Vim pattern
+--------------------------
+    -W         \(\S\+\)
+    -w         \(\w\+\)
+    -s         \s\+
+    --         -
+--------------------------
+
+imap <a-c>
+imap <a-bs>
+imap <c-cr>
+map ,co
+function HDoCompletion()
+                Make a transformation on the current line.
+
+function HAddCompletionRule({ft-pattern},{epattern},{expr},{todoafter},{flags})
+                Add the
+                [HPatternEx({ft-pattern},{epattern}),{expr},{todoafter},{flags}]
+                rule to the list.
+
+function HInsertCompletionRule({ft-pattern},{epattern},{expr},{todoafter},{flags})
+                Insert the
+                [HPatternEx({{ft-pattern},{epattern}),{expr},{todoafter},{flags}]
+                rule to the list.
+
+function HPatternEx({epattern})
+                Convert the {epattern} to Vim pattern.
+
+
+5.2. Make, run~
+
+function HMakeProgram()
+                TODO
+
+function HRunProgram()
+                TODO
+
+function HMakeAndRunProgram()
+                TODO
+
+
+5.3. Miscellaneous~
+
+map .fs
+                Edit the syntax file in a new window.
+map .fi
+                Edit the indent file in a new window.
+
+                                                        
+6. Miscellaneous                                        *hcs-misc*
+
+function HFold({activity})
+                If {activity} is "openall" then open the foldings of each
+                opened file.
+                If {activity} is "closeall" then close the foldings of each
+                opened file.
+                NOTE: the function works with the args and not the buffers.
+
+map ,zM
+                Open the foldings of each opened file.
+
+map ,zR
+                Close the foldings of each opened file.
+
+map ,sy
+                Print the current syntax highlight.
+
+map ,ft
+                Refresh the filetype.
+
+                                                        
+7. Meta                                                 *hcs-meta*
+
+
+7.1. Filetypes~
+
+function HGetLineComment({filetype})
+                Return the comment which belongs to {filetype}.
+                This function deals only with line-comments.
+
+function HFileType({filetype})
+                Set mappings and additional functions which are useful in the
+                current filetype.
+
+map ,Qt >
+                :call HFileType("qtwin")
+map ,th >
+                :call HFileType("texthuen")
+<
+
+7.2. Plugins~
+
+map ,2html
+function H2Html()
+                Creates a HTML file with syntax highlight from the current
+                buffer.
+
+map ,vc
+                Open a VimCommander.
+
+
+7.3. Directories~
+
+map ,CD
+function HCD()
+                The current directory will be the directory in the file
+                explorer.
+
+map ,cd
+                The current directory will be the current file's directory.
+
+
+7.4. Miscellaneous~
+
+function HMakeHelp()
+                Refresh and make the tags for this help.
+
+function HListen()
+                Refresh the current file in every second.
+
+==============================================================================
+II. Other subjects                                      *hcs-other*
+
+
+1. How the vimrc works                                  *hcs-vimrc-work*
+----------------------
+
+Compiling and running programs~
+
+TODO
+
+Creating the tags for this help on dorsw~
+
+Just do that: >
+        :call HMakeHelp()
+<
+Backup~
+
+The backup works only in Vim 7 and above. It will try to find the following
+directories in this order: >
+        /_/vim_backup
+        /-/_/vim_backup
+        e:/_/vim_backup
+<
+If it finds either, then that will be used for backup. Otherwise no backup
+files will be created.
+The name of the backup files will be: >
+        {original filename}.yymmdd_HHMM
+<
+Auto-scripts~
+
+After the running of vimrc other files will be loaded to, if they exist: >
+        /.localrc.vim
+        ./auto.vim
+
+
+2. Interesting things                                   *hcs-interesting*
+---------------------
+(which are NOT in the vimrc)
+
+Options~
+>
+    set numberwidth=1
+    set laststatus=2 " statusline, "ruler"
+    set columns=40 lines=40
+    set statusline=[%1*%<%{getcwd()}%*\]\[%2*%<%F%*\][%M%R%H%W]%=\ %3*[%b,0x%B]%*\%1*[%l,%c]%*\%2*[%P]%*   " pwd in the statusline
+    set virtualedit, list, 'lcs'
+    set cursorline, cursorcolumn
+    set formatoptions: croqlt
+    set switchbuf=useopen,usetab,split  " quickfix window
+    c_CTRL-U " visual delete
+
+Vim as a command or as a filter~
+
+Vim as a command. E.g. removing the last two lines and the second column from
+a file:
+>
+    $ vim -nes -u NONE -c ':exec "normal Gdddd\<c-v>ggx"' -c ':%p' -c ':q!' bevinf
+
+Vim as a filter. It is important the '-' should be the first argument.
+>
+    $ cat file | vim - -nes -u NONE -c ':exec "normal Gdddd\<c-v>ggx"' -c ':%p' -c ':q!'
+
+A -u NONE-t érdemes használni, mert nagyon sok időt lehet vele megspórolni
+(1.0 mp helyett 0.04 (!) mp lett a vim-et használó bash-szkript futási ideje)
+(lehet hogy a syntax on és a filetype on parancsok miatt)
+
+Vim as a server~
+
+/cygdrive/c/Program\ Files/Vim/vim70/gvim.exe -u NONE 
+    --remote-send ':set titlestring=hixx<cr>' --servername h
+
+
+==============================================================================
+III. Filetype-specific things                           *hcs-ft*
+
+
+Vim-help                                                *hcs-ft-vim-help*
+--------
+
+map <cr>
+map <c-cr>
+            Follow the link under the cursor. 
+
+map o
+            Back.
+
+map q >
+            :q
+
+
+hcs.txt                                                 *hcs-ft-hcs.txt*
+-------
+
+map <c-cr>
+            Follow the link under the cursor. 
+..
+            Make tags for |hcs.txt|
+            {only in hcs.txt}
+
+
+Erlang                                                  *hcs-erlang*
+------
+
+
+Mappings~
+
+
+.c
+                Try to find errors in the program.
+
+
+Completions~
+
+---------------------------------------------------
+my_function           my_function() ->
+                          *
+                          .
+---------------------------------------------------
+my_function(          my_function(*) ->
+                          X
+                          .
+---------------------------------------------------
+-d                    -define(*,X).
+---------------------------------------------------
+DEF -d                -define(DEF,*).
+---------------------------------------------------
+ c                    case * of
+                          X -> 
+                      end
+---------------------------------------------------
+ Pattern c            case Pattern of
+                          * -> 
+                      end
+---------------------------------------------------
+ r                    receive
+                          * -> 
+                      end
+---------------------------------------------------
+ ra                   receive
+                          X -> 
+                      after
+                          2000 -> *
+                      end
+---------------------------------------------------
+
+
+Tex                                                     *hcs-tex*
+
+
+Mappings~
+
+
+Completions~
+
+
+---------------------------------------------------
+ -                  \item
+---------------------------------------------------
+ b                  \textbf{*}
+---------------------------------------------------
+ em                 \emph{*}
+---------------------------------------------------
+ t                  \texttt{*}
+---------------------------------------------------
+ B                  word B
+                    \textbf{word}
+---------------------------------------------------
+ EM                 word EM
+                    \emph{word}
+---------------------------------------------------
+ c                  \begin{comment}*
+                    \end{comment}
+---------------------------------------------------
+ T                  \begin{alltt}
+                    *
+                    \end{alltt}
+---------------------------------------------------
+ i                  \begin{itemize}
+                        \item *
+                        \item
+                    \end{itemize}
+---------------------------------------------------
+ V                  \begin{verbatim}
+                    *
+                    \end{verbatim}
+---------------------------------------------------
+
+==============================================================================
+
+IV. TODO                                                *hcs-todo*
+
+
+==============================================================================
+vim:tw=78:fo=tcq2:isk=!-~,^*,^\|,^\":ts=4:ft=help:norl:enc=utf-8:nonu
