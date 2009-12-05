@@ -527,19 +527,7 @@ function CP()
 
 function EB()
 {
-    gvim -f /a/cp/bash/bashrc
-    . ~/.bashrc
-}
-
-function EBL()
-{
-    gvim -f /a/cp/bash/bashrc_linux
-    . ~/.bashrc
-}
-
-function EBH()
-{
-    gvim -f /a/cp/bash/bashrc_`hostname`
+    gvim -f /a/cp/hcs-utils/bin/Bashrc
     . ~/.bashrc
 }
 
