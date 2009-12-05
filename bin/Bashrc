@@ -13,7 +13,7 @@ export PATH=\
 export dors="hcs@192.168.1.102"
 export dorsk="hcs@192.168.1.102"
 export dorsu="hcs@192.168.1.102"
-export daneelk="hcs@192.168.1.100"
+export daneel="hcs@192.168.1.100"
 export daneelk="hcs@192.168.1.100"
 
 export PYTHONPATH=".:/a/cp/python/lib"
