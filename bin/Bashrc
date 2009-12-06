@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# bashrc with all kinds of stuff.
+
 # local stuff
 
 export PATH=\
