@@ -4,6 +4,8 @@ setlocal fo+=r
 " text width
 setlocal tw=79
 
+setlocal comments=n:#
+
 " Run test.py when I say :make, highlight the correct lines and enable me to
 " jump to those.
 set makeprg=./test.py
