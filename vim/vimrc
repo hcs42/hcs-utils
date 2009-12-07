@@ -152,7 +152,9 @@ command! HSave w! `tempfile -d /a/_/folders/vimtmp -p vim--`
 noremap <a-2> :buffers<BAR>
            \ let i = input("Buffer number: ")<BAR>
            \ execute "buffer " . i<CR>
-           "           \execute "execute \"tab drop \".bufname(".i.")"<CR>
+noremap ,bs :buffers<BAR>
+           \ let i = input("Buffer number: ")<BAR>
+           \ execute "buffer " . i<CR>
 
 " -------------- "
 " ShortTabSearch "
@@ -206,8 +208,9 @@ let MRU_Max_Entries = 100
 " Copying stuff to the keyboard "
 " ----------------------------- "
 
-command! FileNameToClipboard let @+=expand('%:p')
-command! PathToClipboard let @+=expand('%:p:h')
+command! FileNameToClipboard let @+=expand('%:p') | let @*=@+
+command! PathToClipboard let @+=expand('%:p:h') | let @*=@+
+command! PureFileNameToClipboard let @+=expand('%:t') | let @*=@+
 
 " -------------------------------- "
 " Executing Vim code in the buffer "
