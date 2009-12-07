@@ -27,8 +27,13 @@ fi
 if [ "`hostname`" = "daneelk" -o  "`hostname`" = "daneel" ]
 then
     comp=daneel
-else
+    desktop_manager=kde4
+elif [ "`hostname`" = "dorsu" -o  "`hostname`" = "dorsk"  -o  "`hostname`" = "dors" ]
+then
     comp=dors
+    desktop_manager=gnome
+else
+    comp=unknown
 fi
 
 ##### Computer dependent stuff #####
@@ -113,6 +118,9 @@ alias '..'='cd ..'
 alias '...'='cd ../..'
 alias '....'='cd ../../..'
 alias '.....'='cd ../../../..'
+alias '......'='cd ../../../../..'
+alias '.......'='cd ../../../../../..'
+alias '........'='cd ../../../../../../..'
 alias K='krusader --left . >/dev/null 2>/dev/null &'
 alias ll='ls -lA'
 alias cp="cp -i"
@@ -124,6 +132,8 @@ alias poweroff_this='sudo poweroff'
 alias ls="ls --color=auto"
 alias R='ls -R'
 alias PR="killall plasma; plasma >/dev/null 2>/dev/null &"
+alias vmi='vim'
+alias gvmi='gvim'
 
 alias n='PodcastGetter'
 
@@ -235,6 +245,55 @@ complete -o default -o nospace -F _git_branch Gb
 complete -o default -o nospace -F _git_checkout Gco
 complete -o default -o nospace -F _git_log Gl
 complete -o default -o nospace -F _git_push Git-rebranch
+
+##### Vim #####
+
+function G
+{
+    gview -
+}
+
+function GS
+{
+    gvim --servername $1 -c "set titlestring=$1"
+}
+
+function g
+{
+    if [ "$2" = "" ]
+    then
+        gvim "$@"
+    else
+        servername=$1
+        shift
+        gvim --servername $servername --remote-tab "$@"
+    fi
+}
+
+##### grep #####
+
+function Grep
+{
+    what="$1"
+    shift
+    grep -r "$@" "$what" . | grep -v '^\([^:]*/CVS/[^:]*\|\./tags\):'
+}
+
+##### cvs #####
+
+alias CU="cvs -q update -d"
+
+# Example: CvsDiff myfile 1.10
+function CvsDiff
+{
+    rev=$2
+    majorrev=`echo $rev | cut -d. -f1`
+    minorrev=`echo $rev | cut -d. -f2`
+    prevrev="$majorrev.$((minorrev - 1))"
+    ((cvs log -r$2 $1 | sed -n '/--------/,/========/p');
+     (cvs diff -ur $prevrev -r $rev $1 | tail -n+7)) | \
+    gview - -c "setf diff"
+}
 
 ##### prompt #####
 
@@ -482,12 +541,15 @@ function Hk
 # putting the argument to the clipboard
 function C()
 {
-    case $comp in
-        daneel)
+    case $desktop_manager in
+        kde4)
             #dcop klipper klipper setClipboardContents "$1"
             dbus-send --type=method_call --dest=org.kde.klipper \
                  /klipper org.kde.klipper.klipper.setClipboardContents \
                  string:"$1"
+            ;;
+        kde3)
+            dcop klipper klipper setClipboardContents "$1"
             ;;
         *)
             echo Command is not available.
@@ -496,13 +558,16 @@ function C()
 }
 
 # putting the content of a file to the clipboard
-function Cf()
+function CF()
 {
-    case $comp in
-        daneel)
+    case $desktop_manager in
+        kde4)
             dbus-send --type=method_call --dest=org.kde.klipper \
                  /klipper org.kde.klipper.klipper.setClipboardContents \
                  string:"`cat $1`"
+            ;;
+        kde3)
+            dcop klipper klipper setClipboardContents "`cat $1`"
             ;;
         *)
             echo Command is not available.
@@ -513,11 +578,14 @@ function Cf()
 # putting the path to the clipboard
 function CP()
 {
-    case $comp in
-        daneel)
+    case $desktop_manager in
+        kde4)
             dbus-send --type=method_call --dest=org.kde.klipper \
                  /klipper org.kde.klipper.klipper.setClipboardContents \
                  string:"`pwd`"
+            ;;
+        kde3)
+            dcop klipper klipper setClipboardContents "`pwd`"
             ;;
         *)
             echo Command is not available.
@@ -552,6 +620,39 @@ Shrek="attish@shrek.unideb.hu"
 alias FAH="cd /a/comp/programs/fah; ./fah6"
 alias ssh="ssh -X"
 alias MNT_daneel="sshfs hcs@192.168.1.100:/ /a/links/daneel"
+
+##### tail #####
+
+function T
+{
+    if [ "$2" = "" ];
+    then
+        n=50
+    else
+        n="$2"
+    fi
+    tail -n $n "$1" | \
+    sed -u 's/.*/x\0/g' | \
+    while read line
+    do
+        echo "[--------------] ${line:1}"
+    done
+
+    tail -n 0 --follow=name --retry "$1" | \
+    sed -u 's/.*/x\0/g' | \
+    while read line
+    do
+        echo "[`date "+%m-%d %H:%M:%S"`] ${line:1}"
+    done
+}
+
+function TT
+    # $1: input
+    # $2: line numbers to include
+    # $3: output file to append
+{
+    T "$1" "$2" | tee -a "$3"
+}
 
 ##### Misc #####
 
