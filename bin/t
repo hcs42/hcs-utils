@@ -13,7 +13,7 @@ def get_trashdir(dir):
     hostname = subprocess.Popen(["hostname"], stdout=subprocess.PIPE).communicate()[0]
     if hostname.strip() in ('daneelk', 'daneel'):
         return '/a/_/folders/trash'
-    elif hostname.strip() in ['dorsk', 'dorsu']:
+    elif hostname.strip() in ('dorsk', 'dorsu'):
         if re.match('/media/flash', dir):
             return '/media/flash/trash'
         elif re.match('/a/(_|cp|petra)', dir):
@@ -22,12 +22,16 @@ def get_trashdir(dir):
             return '/a/links/fat/_/trash'
         else:
             return None
+    elif hostname.strip() == 'mwlx428':
+        return '/home/ecsahoc/tmp'
 
 class HCSExc:
     def __init__(self,message):
         self.message = message
     def __str__(self):
         return self.message
+
+trashlog = os.path.join(os.getenv("HOME"), '.trash-log')
 
 def move_to_trash(file):
     if not os.path.exists(file):
@@ -48,6 +52,10 @@ def move_to_trash(file):
     while os.path.exists(os.path.join(trashdir,newbasename)):
         postfix += 1
         newbasename = basename+'_'+str(postfix)
+    f = open(trashlog, 'a')
+    f.write("%s %s\n" %
+            (newbasename, os.path.join(trashdir,newbasename)))
+    f.close()
     shutil.move(file,os.path.join(trashdir,newbasename))
 
 def parse_args():
