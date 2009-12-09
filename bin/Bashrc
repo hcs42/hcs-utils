@@ -354,7 +354,7 @@ fi
 
 ##### emacs #####
 
-function em 
+function em
 {
     emacs --no-splash "$@" >/dev/null 2>/dev/null &
 }
