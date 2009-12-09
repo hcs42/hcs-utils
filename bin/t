@@ -9,8 +9,6 @@ import shutil
 import subprocess
 import sys
 
-trashdir = '/a/_/trash'
-
 def get_trashdir(dir):
     hostname = subprocess.Popen(["hostname"], stdout=subprocess.PIPE).communicate()[0]
     if hostname.strip() in ('daneelk', 'daneel'):
@@ -71,6 +69,7 @@ def main(options, args):
     if options.info:
         sys.stdout.write('Size of trash in kilobytes: ')
         sys.stdout.flush()
+        trashdir = get_trashdir(abspath)
         os.system('du -sk '+trashdir+' | cut -f1')
         return
     elif options.show_trashdir:
