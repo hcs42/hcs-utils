@@ -34,6 +34,7 @@ else
     comp=unknown
 fi
 
+
 ##### Computer dependent stuff #####
 
 case $comp in
@@ -237,12 +238,15 @@ function Gf
     git fetch attis
 }
 
-complete -o default -o nospace -F _git_diff Gd
-complete -o default -o nospace -F _git_commit Gc
-complete -o default -o nospace -F _git_branch Gb
-complete -o default -o nospace -F _git_checkout Gco
-complete -o default -o nospace -F _git_log Gl
-complete -o default -o nospace -F _git_push Git-rebranch
+if [ "$linux" = true ]
+then
+    complete -o default -o nospace -F _git_diff Gd
+    complete -o default -o nospace -F _git_commit Gc
+    complete -o default -o nospace -F _git_branch Gb
+    complete -o default -o nospace -F _git_checkout Gco
+    complete -o default -o nospace -F _git_log Gl
+    complete -o default -o nospace -F _git_push Git-rebranch
+fi
 
 ##### Vim #####
 
@@ -274,7 +278,7 @@ function Grep
 {
     what="$1"
     shift
-    grep -r "$@" "$what" . | grep -v '^\([^:]*/CVS/[^:]*\|\./tags\):'
+    grep -r "$@" "$what" . | grep -v '^\([^:]*/CVS/[^:]*\|\./tags\):\|^Binary'
 }
 
 ##### cvs #####
@@ -659,8 +663,11 @@ function grep_acc
     grep "$@" "^[][(){}@#,+$~'\"[:space:]=./_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-]*$"
 }
 
-used_space=`df / | tail -n 1 | sed 's/.* \([^ ]*\)%.*/\1/g'`
-if [ "$used_space" -gt 95 ]
+if [ "$comp" = daneel -o "$comp" = dors ]
 then
-    echo -n "$used_space% "
+    used_space=`df / | tail -n 1 | sed 's/.* \([^ ]*\)%.*/\1/g'`
+    if [ "$used_space" -gt 95 ]
+    then
+        echo -n "$used_space% "
+    fi
 fi
