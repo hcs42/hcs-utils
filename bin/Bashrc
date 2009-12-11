@@ -671,3 +671,8 @@ then
         echo -n "$used_space% "
     fi
 fi
+
+function Find1
+{
+    find -L -name "$@" | sed 1q
+}
