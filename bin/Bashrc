@@ -396,6 +396,7 @@ alias d=". CdLs"
 
 ##### GW #####
 
+# open a *g*vim with the result of *w*hich
 function GW
 {
     x=`which $1`
@@ -407,7 +408,20 @@ function GW
     fi
 }
 
+# change *d*irectory of the result of *w*hich
+function DW
+{
+    x=`which $1`
+    if [ "$x" = "" ]
+    then
+        echo "no such thing"
+    else
+        cd $(dirname $(readlink -f $(which Bashrc)))
+    fi
+}
+
 complete -o default -c GW
+complete -o default -c DW
 
 ##### note #####
 
