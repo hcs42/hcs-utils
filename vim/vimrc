@@ -8,6 +8,7 @@ set hidden
 set kp=
 set nostartofline
 set laststatus=2
+set noswapfile
 
 if version >= 700
     set statusline=%{expand('%:p:h')}\ %#hcsSLFileName#%t%##\ %h%m\ %L\ %=%#hcsSLBufferNumber#%n%##\ %#hcsSLWindowNumber#%{winnr()}%##%#hcsSLFileName#%##\ %l\ %v
@@ -29,6 +30,10 @@ noremap ,c*w :*s/\<<c-r>=expand("<cword>")<cr>\>/<c-r>=expand("<cword>")<cr>/g<l
 cnoremap <c-s> \_s\+
 noremap <c-w>O :WinFullScreen<cr>
 noremap ,m `m
+noremap ,cl :set cul!<cr>
+noremap ,cc :set cuc!<cr>
+noremap ,cb :set cuc! cul!<cr>
+noremap <F11> mkHmlggg?G`lzt`k
 
 noremap ,d "+d
 noremap ,y "+y
