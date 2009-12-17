@@ -230,3 +230,14 @@ endfunction
 vnoremap ,vv :call HRunVisual('v')<cr>
 nnoremap ,vv :call HRunVisual('n')<cr>
 noremap <silent> ,vl yy:@"<cr>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""
+
+noremap ,*          :set hls<cr>:let @/="\\<<c-r><c-w>\\>"<cr>
+noremap ,,*          :set hls<cr>:let @/="\\c<c-r><c-w>"<cr>
+vnoremap ,*         :<del><del><del><del><del>set hls<cr>:let @/="<c-r>*"<cr>
+noremap ,v*         :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '<c-r>/' 
+vnoremap ,v*        :<del><del><del><del><del>set hls<cr>:let @/="<c-r>*"<cr>:vim '<c-r>*' 
+noremap ,vw*        :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '\<<c-r>/\>' 
+noremap ,hw         :execute ":help " . expand("<cword>")<cr>
+
