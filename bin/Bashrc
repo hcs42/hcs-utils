@@ -278,7 +278,7 @@ function Grep
 {
     what="$1"
     shift
-    grep -r "$@" "$what" . | grep -v '^\([^:]*/CVS/[^:]*\|\./tags\):\|^Binary'
+    grep -r "$@" "$what" . | grep -v '^\([^:]*/CVS/[^:]*\|\./tags\|./files.txt\|./files_all.txt\):\|^Binary'
 }
 
 ##### cvs #####
