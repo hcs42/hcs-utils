@@ -50,9 +50,9 @@ def weekday_to_datetime(year, week, dayofweek, strf=False):
     Returns: datetime.datetime
     """
 
-    jan1 = datetime.date(year, 1, 1)
-    day_diff = (dayofweek - jan1.isoweekday()) + (week - 1) * 7
-    result = jan1 + datetime.timedelta(days = day_diff)
+    jan4 = datetime.date(year, 1, 4)
+    day_diff = (dayofweek - jan4.isoweekday()) + (week - 1) * 7
+    result = jan4 + datetime.timedelta(days = day_diff)
     if not strf:
         return result
     else:
