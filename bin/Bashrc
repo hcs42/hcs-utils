@@ -30,6 +30,10 @@ elif [ "`hostname`" = "dorsu" -o  "`hostname`" = "dorsk"  -o  "`hostname`" = "do
 then
     comp=dors
     desktop_manager=gnome
+elif [ "`hostname`" = "giskard" ]
+then
+    comp=giskard
+    desktop_manager=gnome
 else
     comp=unknown
 fi
@@ -95,6 +99,19 @@ case $comp in
 
         alias mp="mplayer -vo x11"
         ;;
+    giskard)
+
+        function RSync
+        # $1: other rsync options, e.g.:
+        #     --delete --force --size-only --list-only
+        {
+            #for i in cp docs
+            for i in docs
+            do
+                echo rsync -rulpEtv --delete --force "$@" --exclude '.git' /a/$i/ "$HOME/Ubuntu One/$i/"
+                rsync -rulpEtv --delete --force "$@" /a/$i/ "$HOME/Ubuntu One/$i/"
+            done
+        }
 esac
 
 ##### settings #####
@@ -152,7 +169,8 @@ function LC
 {
     (cat /a/cp/hk/hk/hcs/hcslog_daneelk;
      cat /a/cp/hk/hk/hcs/hcslog_dorsu;
-     cat /a/cp/hk/hk/hcs/hcslog_dorsk) | sort | tail -n 20
+     cat /a/cp/hk/hk/hcs/hcslog_dorsk;
+     cat /a/cp/hk/hk/hcs/hcslog_giskard) | sort | tail -n 20
 }
 
 function s
@@ -166,7 +184,7 @@ function TS
     Timestat -H --since 2009-08-03 -i python:perl:wave_ "$@"
 }
 
-export ACTIONFILES=/a/cp/hk/hk/hcs/hcslog_dorsu:/a/cp/hk/hk/hcs/hcslog_dorsk:/a/cp/hk/hk/hcs/hcslog_daneelk
+export ACTIONFILES=/a/cp/hk/hk/hcs/hcslog_dorsu:/a/cp/hk/hk/hcs/hcslog_dorsk:/a/cp/hk/hk/hcs/hcslog_daneelk:/a/cp/hk/hk/hcs/hcslog_giskard
 
 ##### git #####
 
@@ -272,6 +290,16 @@ function g
     fi
 }
 
+function gm
+{
+    if [ "$1" = "" ]
+    then
+        gvim --servername GVIM 
+    else
+        gvim --servername GVIM --remote-tab "$@"
+    fi
+}
+
 ##### grep #####
 
 function Grep
@@ -345,12 +373,7 @@ function parse_git_branch
 
 PS1="\w\$(parse_git_branch) $ "
 
-if [ "`hostname`" = "dorsk" -o "`hostname`" = "dorsu"  -o "`hostname`" = "daneelk" ]
-then
-    p1
-else
-    p3
-fi
+p3
 
 ##### emacs #####
 
@@ -416,7 +439,7 @@ function DW
     then
         echo "no such thing"
     else
-        cd $(dirname $(readlink -f $(which Bashrc)))
+        cd $(dirname $(readlink -f $(which $x)))
     fi
 }
 
@@ -521,6 +544,16 @@ function Helpedit
     fi
 }
 
+function Helpfind
+{
+    help_file=`get_help_file "$1" anyway`
+    if [ "$help_file" = "" ]; then
+        echo "Subject '$1' does not exist."
+    else
+        echo "$help_file"
+    fi
+}
+
 function Helplist
 {
     ls "/a/docs/hcs/comp/hcs_help" | sed 's/\.htxt//g' | sed 's/\.txt//g'
@@ -617,6 +650,11 @@ function EB()
     . ~/.bashrc
 }
 
+function B()
+{
+    . ~/.bashrc
+}
+
 ##### aliases #####
 
 alias If=/sbin/ifconfig
@@ -626,13 +664,10 @@ alias MNT_vali="sshfs hoch@vali.inf.elte.hu:/ /a/x/vali"
 alias UMNT_vali="fusermount -u /a/x/vali"
 alias MNT_doc2="sshfs hoch@doc2.inf.elte.hu:/home /a/x/doc2 && cd /a/x/doc2"
 alias UMNT_doc2="fusermount -u /a/x/doc2"
-alias MNT_shrek="sshfs -o workaround=rename attish@shrek.unideb.hu:/home/attish/public_html/heap /a/x/shrek"
-alias UMNT_shrek="fusermount -u /a/x/shrek && cd /a/x/shrek"
 alias TEA="SLEEP 2 && SOUND"
 alias WP="WaitProcess -n"
 alias V="Video -g"
 alias VNC="vncviewer 192.168.0.3:3"
-Shrek="attish@shrek.unideb.hu"
 alias FAH="cd /a/comp/programs/fah; ./fah6"
 alias ssh="ssh -X"
 alias MNT_daneel="sshfs hcs@192.168.1.100:/ /a/links/daneel"
