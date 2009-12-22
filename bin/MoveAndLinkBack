@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# CopyAndLinkBack a/f b
+# mv a/f b
+# ln -s b/f a/f
+
+# Moves the given file and creates a symlink to the original location that
+# points to its new location.
+
+function print_help
+{
+cat <<EOF
+NAME
+    MoveAndLinkBack
+USAGE
+    MoveAndLinkBack <file> <directory>
+DESCRIPTION
+    Moves the given file and creates a symlink to the original location that
+    points to its new location.
+EXAMPLE
+    $ mkdir a b # creating test dirs
+    $ touch a/x # creating a test file
+    $ MoveAndLinkBack x ../b # moving the file into b and linking it back
+    mv x ../b
+    ln -s ../b/x x
+    $ cd ..
+    $ ls -lA b
+    total 0
+    -rw-r--r-- 1 hcs hcs 0 2009-12-22 20:34 x
+    $ ls -lA a
+    total 0
+    lrwxrwxrwx 1 hcs hcs 6 2009-12-22 20:34 x -> ../b/x
+OPTIONS
+    -h, --help
+        This help
+AUTHOR
+    Csaba Hoch <csaba.hoch@gmail.com>
+EOF
+}
+
+case $1 in
+    -h|--help)
+        print_help
+        exit
+        ;;
+esac
+
+if [ ! -e "$1" ]
+then
+    echo "File or directory does not exist: $1"
+    exit 1
+elif [ "$(basename $1)" != "$1" ]
+then
+    echo "You should be in the directory of the file to be copied and "
+    echo "symlinked."
+    exit 1
+elif [ ! -d "$2" ]
+then
+    echo "Not a directory: $2"
+    exit 1
+fi
+
+echo mv "$1" "$2"
+mv "$1" "$2"
+if [ "$?" != 0 ]
+then
+    echo "CopyAndLinkBack: exiting"
+    exit 1
+fi
+
+echo ln -s "$2/$(basename $1)" "$1"
+ln -s "$2/$(basename $1)" "$1"
+if [ "$?" != 0 ]
+then
+    echo "CopyAndLinkBack: exiting"
+    exit 1
+fi
+
