@@ -14,7 +14,7 @@ DESCRIPTION
     into /var/log/apt-updates. If the current user is not root, it uses sudo to
     became a root.
 OPTIONS
-    -h, --help  
+    -h, --help
         This help
 AUTHOR
     Csaba Hoch <csaba.hoch@gmail.com>

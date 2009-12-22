@@ -60,7 +60,7 @@ EXAMPLES
 DETAILS
     Two files will be created in the current directory.
     The file plist contains the list of the video files.
-    The file pnum contains the number of the video file which has to be played 
+    The file pnum contains the number of the video file which has to be played
     next.
     The file ppos is created when a position is stored (it stored the
     position).
@@ -216,7 +216,7 @@ def play(od):
     playlist = read_playlist()
     use_getch = od['getch']
     command_queue = od['commands'].strip().split(' ')
-    start_pos = od['start-position'] 
+    start_pos = od['start-position']
     if command_queue == ['']:
         command_queue = []
     while state != 'finished':

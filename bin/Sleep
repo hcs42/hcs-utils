@@ -14,7 +14,7 @@ DESCRIPTION
     Sleeps given minutes or until the given time. The sleeping time can be
     relative (minutes) or absolute (hour:minute).
 OPTIONS
-    -h, --help  
+    -h, --help
         This help.
 EXAMPLES
     Sleep 10      # sleeps 10 minutes
@@ -30,7 +30,7 @@ sleepAbsolute=false
 
 # Processing the arguments.
 i=1
-while [ "$#" != "0" ] 
+while [ "$#" != "0" ]
 do
     if [ "$1" = "-h" -o  "$1" = "--help" ]
     then

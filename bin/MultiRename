@@ -17,7 +17,7 @@ DESCRIPTION
      The script can be interrupted with CTRL-C from the shell, and after that
      the gvim can be closed (without saving the file).
 OPTIONS
-    -h, --help  
+    -h, --help
         This help
 AUTHOR
     Csaba Hoch <csaba.hoch@gmail.com>

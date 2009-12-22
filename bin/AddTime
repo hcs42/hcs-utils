@@ -16,7 +16,7 @@ EXAMPLE
     [21:54:59] a
     [21:55:01] b
 OPTIONS
-    -h, --help  
+    -h, --help
         This help
 AUTHOR
     Csaba Hoch <csaba.hoch@gmail.com>

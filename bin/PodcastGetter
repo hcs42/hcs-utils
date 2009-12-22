@@ -38,10 +38,10 @@ import sys
 import tempfile
 import urllib.request
 
-        
+
 def weekday_to_datetime(year, week, dayofweek, strf=False):
     """Creates a datetime object based on year+week+dayofweek.
-    
+
     Arguments:
     - `year` (int)
     - `week` (int) -- Should be between 1 and 53.
@@ -177,7 +177,7 @@ def get_mr1_time(month, day, hour, mp3_name, a=None, b=None):
         wav2_name = basename+'2.wav'
         subprocess.call(['sox', '-t', 'wav', wav_name, '-t', 'wav', wav2_name, \
                          'trim', a+':10', b+':00'])
-        
+
     subprocess.call(['lame', wav2_name, mp3_name])
     os.remove(rm_name)
     os.remove(wav_name)
@@ -357,7 +357,7 @@ def handle_help(a):
 
     sys.stdout.write(help_string)
     return True
-    
+
 def main(a):
 
     handle_not_found_error = False

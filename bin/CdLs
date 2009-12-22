@@ -13,7 +13,7 @@ USAGE
 DESCRIPTION
     Changes the current directory and list its content. If the directory is no
     given, it just lists the content of the current directory.
-    
+
     Make an alias in the bashrc before using the program:
 
         alias d=". CdLs"
@@ -22,7 +22,7 @@ DESCRIPTION
 EXAMPLE
     d /mydir
 OPTIONS
-    -h, --help  
+    -h, --help
         This help
 AUTHOR
     Csaba Hoch <csaba.hoch@gmail.com>

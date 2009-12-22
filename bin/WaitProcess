@@ -16,7 +16,7 @@ DESCRIPTION
     "WaitProcess -n gvim" is invoked, WaitProcess will terminate only when
     there is no gvim in the process list.
 OPTIONS
-    -h, --help  
+    -h, --help
         This help
     -i, --identifier processId
         The identifier of the process.
@@ -35,7 +35,7 @@ process="" # name or pid of the process
 printProcessList=true
 
 # Processing the arguments.
-while [ "$#" != "0" ] 
+while [ "$#" != "0" ]
 do
     if [ "$1" = "-h" -o  "$1" = "--help" ]
     then

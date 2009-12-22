@@ -294,7 +294,7 @@ function gm
 {
     if [ "$1" = "" ]
     then
-        gvim --servername GVIM 
+        gvim --servername GVIM
     else
         gvim --servername GVIM --remote-tab "$@"
     fi

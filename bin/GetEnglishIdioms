@@ -14,7 +14,7 @@ DESCRIPTION
     Downloads the English idioms for the current month from
     learn-english-today.com.
 OPTIONS
-    -h, --help  
+    -h, --help
         This help
 AUTHOR
     Csaba Hoch <csaba.hoch@gmail.com>
@@ -37,4 +37,4 @@ cd "$ENGLISH_IDIOM_DIR"
 for i in `seq 1 31`; do
     if [ "$i" -lt 10 ]; then j=0$i; else j=$i; fi
     wget http://www.learn-english-today.com/idioms/$i.htm -O "20$year$month$j.html"
-done 
+done
