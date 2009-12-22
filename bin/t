@@ -11,7 +11,7 @@ import sys
 
 def get_trashdir(dir):
     hostname = subprocess.Popen(["hostname"], stdout=subprocess.PIPE).communicate()[0]
-    if hostname.strip() in ('daneelk', 'daneel'):
+    if hostname.strip() in ('daneelk', 'daneel', 'giskard'):
         return '/a/_/folders/trash'
     elif hostname.strip() in ('dorsk', 'dorsu'):
         if re.match('/media/flash', dir):
