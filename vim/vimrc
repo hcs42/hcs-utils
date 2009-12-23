@@ -236,6 +236,40 @@ vnoremap ,vv :call HRunVisual('v')<cr>
 nnoremap ,vv :call HRunVisual('n')<cr>
 noremap <silent> ,vl yy:@"<cr>
 
+" ------------------------------- "
+" Editing files in the quick list "
+" ------------------------------- "
+
+" Finds the given file and edits it.
+"
+" Place a list like this in your vimrc:
+"     if version >= 700
+"         let g:hcs_quickfilelist = [
+"         \    [ 'vimrc',  $MYVIMRC],
+"         \    [ 'email', '/home/me/docs/email.txt'],
+"         \]
+"     endif
+" Examples:
+"     :E vimrc
+"     :Sp email
+function! E(f, edit)
+    for item in g:hcs_quickfilelist
+        if item[0] == a:f
+            let f = item[1]
+            break
+        endif
+    endfor
+    if a:edit == 'edit'
+        execute 'edit ' . f
+    else
+        execute 'split ' . f
+    endif
+endfunction
+
+command! -nargs=1 E call E('<args>', 'edit')
+command! -nargs=1 SP call E('<args>', 'split')
+command! -nargs=1 Sp call E('<args>', 'split')
+
 """"""""""""""""""""""""""""""""""""""""""""""""""
 
 noremap ,*          :set hls<cr>:let @/="\\<<c-r><c-w>\\>"<cr>
