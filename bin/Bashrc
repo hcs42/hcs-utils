@@ -112,6 +112,9 @@ case $comp in
                 rsync -rulpEtv --delete --force "$@" /a/$i/ "$HOME/Ubuntu One/$i/"
             done
         }
+
+        alias mp="mplayer -fs"
+        ;;
 esac
 
 ##### settings #####
@@ -150,7 +153,6 @@ alias R='ls -R'
 alias PR="killall plasma; plasma >/dev/null 2>/dev/null &"
 alias vmi='vim'
 alias gvmi='gvim'
-
 alias n='PodcastGetter'
 
 ##### Timestat #####
