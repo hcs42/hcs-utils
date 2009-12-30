@@ -51,7 +51,7 @@ OPTIONS
     -p, --pattern _pattern_
         The files which match this pattern will be add to the file list.
         _pattern_ is a Python regular expression.
-        The default is '\\.(mp3|avi|mpeg|mpg)'
+        The default is '.*\\.(mp3|avi|mpeg|mpg)'
 EXAMPLES
     Initializing the contents of the directory for playing:
         Video add
