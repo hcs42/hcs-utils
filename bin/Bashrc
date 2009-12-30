@@ -43,44 +43,7 @@ fi
 
 case $comp in
 
-    daneel)
-
-        alias MNT_dors="sshfs $dors:/ /a/links/dors"
-        alias UMNT_dors="fusermount -u /a/links/dors"
-        alias Fm="FlashMount mount"
-        alias Fu="FlashMount umount"
-        alias Sf="Sync_flash m"
-
-        function DVI
-        {
-            okular "$1" >/dev/null 2>/dev/null &
-        }
-
-        function PDF
-        {
-            okular "$1" >/dev/null 2>/dev/null &
-        }
-
-        function PS
-        {
-            okular "$1" >/dev/null 2>/dev/null &
-        }
-
-        alias mp="mplayer"
-        alias -- -25="cd /a/media/video/todel/25men; Video p -g"
-
-        function RSync
-        # $1: other rsync options, e.g.:
-        #     --delete --force --size-only --list-only
-        {
-            for i in comp cp docs links media petra
-            do
-                rsync -rulpEt --delete --force $1 /a/$i/ /media/backup/$i/
-            done
-        }
-        ;;
-
-    dors)
+    giskard)
 
         function DVI
         {
@@ -95,22 +58,6 @@ case $comp in
         function PS
         {
             kghostview "$1" >/dev/null 2>/dev/null &
-        }
-
-        alias mp="mplayer -vo x11"
-        ;;
-    giskard)
-
-        function RSync
-        # $1: other rsync options, e.g.:
-        #     --delete --force --size-only --list-only
-        {
-            #for i in cp docs
-            for i in docs
-            do
-                echo rsync -rulpEtv --delete --force "$@" --exclude '.git' /a/$i/ "$HOME/Ubuntu One/$i/"
-                rsync -rulpEtv --delete --force "$@" /a/$i/ "$HOME/Ubuntu One/$i/"
-            done
         }
 
         alias mp="mplayer -fs"
