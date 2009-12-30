@@ -196,8 +196,6 @@ alias Gt='gitk --all &'
 alias Gd='PAGER="" git diff'
 alias GD='PAGER="" git diff | gview -'
 alias Gp='git pull'
-alias Gl='git log --color'
-alias G1='Gl -p -n1 --stat'
 
 function Gpu
 # $1: thread to push
@@ -258,6 +256,21 @@ function Gf
     git fetch attis
 }
 
+### git log ###
+
+alias Gl='git log --color'
+
+# show one commit
+alias G1='Gl -p -n1 --stat'
+
+# git log tree
+alias Glt="Gl --all --graph --decorate --date-order --date=default"
+
+# git log references
+alias Glr="Gl --all --decorate --date=default --walk-reflogs --no-merges"
+
+### git completions ###
+
 if [ "$linux" = true ]
 then
     complete -o default -o nospace -F _git_diff Gd
@@ -265,6 +278,9 @@ then
     complete -o default -o nospace -F _git_branch Gb
     complete -o default -o nospace -F _git_checkout Gco
     complete -o default -o nospace -F _git_log Gl
+    complete -o default -o nospace -F _git_log G1
+    complete -o default -o nospace -F _git_log Glt
+    complete -o default -o nospace -F _git_log Glr
     complete -o default -o nospace -F _git_push Git-rebranch
 fi
 
