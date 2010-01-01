@@ -210,10 +210,10 @@ alias Gl='git log --color'
 # show one commit
 alias G1='Gl -p -n1 --stat'
 
-# git log tree
+# git log tree (similar to what gitk shows)
 alias Glt="Gl --all --graph --decorate --date-order --date=default"
 
-# git log references
+# git log references (newest commit on the top: like a "real" history)
 alias Glr="Gl --all --decorate --date=default --walk-reflogs --no-merges"
 
 ### git completions ###
