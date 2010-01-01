@@ -47,6 +47,7 @@ noremap ,,p "*p
 noremap ,,P "*P
 noremap ,,gp "*gp
 noremap ,,gP "*gP
+noremap ,<space> :%s/ \+$/<cr>
 
 " Invoking external programs
 command! FollowLink call FollowLink()
