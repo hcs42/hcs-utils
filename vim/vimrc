@@ -273,9 +273,10 @@ command! -nargs=1 Sp call E('<args>', 'split')
 
 """"""""""""""""""""""""""""""""""""""""""""""""""
 
-noremap ,*          :set hls<cr>:let @/="\\<<c-r><c-w>\\>"<cr>
-noremap ,,*          :set hls<cr>:let @/="\\c<c-r><c-w>"<cr>
-vnoremap ,*         :<del><del><del><del><del>set hls<cr>:let @/="<c-r>*"<cr>
+nnoremap ,*         :set hls<cr>:let @/="\\<<c-r><c-w>\\>"<cr>
+nnoremap ,,*        :set hls<cr>:let @/="\\c<c-r><c-w>"<cr>
+vnoremap ,*         :<del><del><del><del><del>set hls<cr>:let @/="\\<<c-r>*\\>"<cr>
+vnoremap ,,*        :<del><del><del><del><del>set hls<cr>:let @/="\\c<c-r>*"<cr>
 noremap ,v*         :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '<c-r>/' 
 vnoremap ,v*        :<del><del><del><del><del>set hls<cr>:let @/="<c-r>*"<cr>:vim '<c-r>*' 
 noremap ,vw*        :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '\<<c-r>/\>' 
