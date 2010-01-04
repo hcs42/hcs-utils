@@ -269,9 +269,7 @@ function gm
 
 function Grep
 {
-    what="$1"
-    shift
-    grep -r "$@" "$what" . | grep -v '^\([^:]*/CVS/[^:]*\|\./tags\|./files.txt\|./files_all.txt\):\|^Binary'
+    grep -r "$@" . | grep -v '^\([^:]*/CVS/[^:]*\|\./tags\|./files.txt\|./files_all.txt\):\|^Binary'
 }
 
 ##### cvs #####
