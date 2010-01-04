@@ -13,7 +13,8 @@ cat <<EOF
 NAME
     MoveAndLinkBack
 USAGE
-    MoveAndLinkBack <file> <directory>
+    MoveAndLinkBack <file> <target_directory>
+    MoveAndLinkBack <file> <target_file>
 DESCRIPTION
     Moves the given file and creates a symlink to the original location that
     points to its new location.
@@ -54,22 +55,37 @@ then
     echo "You should be in the directory of the file to be copied and "
     echo "symlinked."
     exit 1
-elif [ ! -d "$2" ]
+elif [ -d "$2" ]
 then
-    echo "Not a directory: $2"
+    # the given target ($2) is a directory
+    target_file="$2/$(basename $1)"
+elif [ ! -d "$(dirname $2)" ]
+then
+    # the given target ($2) is a filename, so its parent directory should
+    # exist
+    echo "No such a directory: $(dirname $2)"
     exit 1
+elif [ -f "$2" ]
+then
+    # the given target ($2) is a filename, but it already exists
+    echo "Target file already exists: $2"
+    exit 1
+else # [ -d "$(dirname $2)" -a ! -f "$2" ]
+    # the given target ($2) is a filename, whose parent directory exists, but
+    # the target file does not
+    target_file="$2"
 fi
 
-echo mv "$1" "$2"
-mv "$1" "$2"
+echo mv "$1" "$target_file"
+mv "$1" "$target_file"
 if [ "$?" != 0 ]
 then
     echo "CopyAndLinkBack: exiting"
     exit 1
 fi
 
-echo ln -s "$2/$(basename $1)" "$1"
-ln -s "$2/$(basename $1)" "$1"
+echo ln -s "$target_file" "$1"
+ln -s "$target_file" "$1"
 if [ "$?" != 0 ]
 then
     echo "CopyAndLinkBack: exiting"
