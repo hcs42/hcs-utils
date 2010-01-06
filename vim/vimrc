@@ -253,6 +253,7 @@ noremap <silent> ,vl yy:@"<cr>
 " Examples:
 "     :E vimrc
 "     :Sp email
+if version >= 700
 function! E(f, edit)
     for item in g:hcs_quickfilelist
         if item[0] == a:f
@@ -270,6 +271,7 @@ endfunction
 command! -nargs=1 E call E('<args>', 'edit')
 command! -nargs=1 SP call E('<args>', 'split')
 command! -nargs=1 Sp call E('<args>', 'split')
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""
 

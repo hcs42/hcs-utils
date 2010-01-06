@@ -8,6 +8,10 @@
 "   windows sizes
 "   Map :WinFullScreen for any key you like and enjoy vim's windows
 
+if version < 700
+    finish
+endif
+
 if exists('win_full_screen_plugin')
     "finish
 endif
