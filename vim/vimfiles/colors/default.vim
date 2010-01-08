@@ -22,5 +22,5 @@ hi hcsSLFileName guifg=yellow guibg=darkgray
 hi hcsSLFileNameMod guifg=green guibg=darkgray gui=bold
 hi hcsSLBufferNumber guifg=red guibg=black
 hi hcsSLWindowNumber guifg=blue guibg=black
-hi hcsSLFileLineNumber guifg=yellow guibg=black
+hi hcsSLFileLineNumber guifg=green guibg=black
 hi hcsSLLineColNumber guifg=white guibg=black
