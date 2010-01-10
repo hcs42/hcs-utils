@@ -116,10 +116,13 @@ function LE
 
 function LC
 {
-    (cat /a/cp/hk/hk/hcs/hcslog_daneelk;
-     cat /a/cp/hk/hk/hcs/hcslog_dorsu;
-     cat /a/cp/hk/hk/hcs/hcslog_dorsk;
-     cat /a/cp/hk/hk/hcs/hcslog_giskard) | sort | tail -n 20
+    if [ "$1" = "" ]
+    then
+        len=20
+    else
+        len="$1"
+    fi
+    cat /a/cp/hk/hk/hcs/hcslog_giskard | tail -n "$len"
 }
 
 function s
