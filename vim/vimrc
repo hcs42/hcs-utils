@@ -50,6 +50,8 @@ noremap ,,gP "*gP
 noremap ,<space> :%s/ \+$/<cr>
 nnoremap <up> g<up>
 nnoremap <down> g<down>
+nnoremap <c-j> <c-e>
+nnoremap <c-k> <c-y>
 
 " Invoking external programs
 command! FollowLink call FollowLink()
