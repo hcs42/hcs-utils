@@ -10,34 +10,11 @@ export PATH=\
 "/a/comp/programs/bin:"\
 "$PATH"
 
-export dors="hcs@192.168.1.102"
-export dorsk="hcs@192.168.1.102"
-export dorsu="hcs@192.168.1.102"
-export daneel="hcs@192.168.1.100"
-export daneelk="hcs@192.168.1.100"
-
 export PYTHONPATH=".:/a/cp/python/lib"
 
 if [ -e /a/comp/programs/vim/vim_runtime ]; then
     export VIMRUNTIME=/a/comp/programs/vim/vim_runtime
 fi
-
-if [ "`hostname`" = "daneelk" -o  "`hostname`" = "daneel" ]
-then
-    comp=daneel
-    desktop_manager=kde4
-elif [ "`hostname`" = "dorsu" -o  "`hostname`" = "dorsk"  -o  "`hostname`" = "dors" ]
-then
-    comp=dors
-    desktop_manager=gnome
-elif [ "`hostname`" = "giskard" ]
-then
-    comp=giskard
-    desktop_manager=gnome
-else
-    comp=unknown
-fi
-
 
 ##### Computer dependent stuff #####
 
@@ -92,9 +69,6 @@ alias ll='ls -lA'
 alias cp="cp -i"
 alias mv="mv -i"
 alias GQ="gqview 1>/dev/null 2>/dev/null &"
-alias poweroff_daneel='(ssh $daneel /usr/bin/shutdown -h now) &'
-alias poweroff_dors='(ssh $dors /usr/bin/shutdown -h now) &'
-alias poweroff_this='sudo poweroff'
 alias ls="ls --color=auto"
 alias R='ls -R'
 alias PR="killall plasma; plasma >/dev/null 2>/dev/null &"
@@ -136,7 +110,7 @@ function TS
     Timestat -H --since 2009-08-03 -i python:perl:wave_ "$@"
 }
 
-export ACTIONFILES=/a/cp/hk/hk/hcs/hcslog_dorsu:/a/cp/hk/hk/hcs/hcslog_dorsk:/a/cp/hk/hk/hcs/hcslog_daneelk:/a/cp/hk/hk/hcs/hcslog_giskard
+export ACTIONFILES=/a/cp/hk/hk/hcs/hcslog_giskard
 
 ##### git #####
 
@@ -420,48 +394,6 @@ function note
     echo "$@" >> note
 }
 
-##### unison #####
-
-function hcs_unison
-    # $1: profile name
-    # $2: address of other machine
-{
-    cd /a
-    prf="$HOME/.unison/temp.prf"
-    echo 'root = /a' > "$prf"
-    if [ $comp = "daneel" ]
-    then
-        echo "root = ssh://$dors/a" >> "$prf"
-    else
-        echo "root = ssh://$daneel/a" >> "$prf"
-    fi
-
-    echo >>"$prf"
-
-    cat "/a/comp/folders/unison/$1.prf_" >> "$prf"
-
-    echo "Using ~/.unison/temp.prf"
-    echo unison -auto temp
-    unison -auto temp
-}
-
-function UC
-{
-    hcs_unison cp $1
-}
-
-function UD
-{
-    hcs_unison docs $1
-}
-
-function UP
-{
-    hcs_unison petra1 $1
-}
-
-alias UE="gvim /a/comp/folders/unison/{docs,cp,petra1}.prf_"
-
 ##### hcshelp #####
 
 alias H=Help
@@ -636,7 +568,6 @@ alias V="Video -g"
 alias VNC="vncviewer 192.168.0.3:3"
 alias FAH="cd /a/comp/programs/fah; ./fah6"
 alias ssh="ssh -X"
-alias MNT_daneel="sshfs hcs@192.168.1.100:/ /a/links/daneel"
 alias x="xmessage -file ~/.bashrc -nearmouse"
 
 ##### tail #####
@@ -678,15 +609,6 @@ function grep_acc
 {
     grep "$@" "^[][(){}@#,+$~'\"[:space:]=./_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-]*$"
 }
-
-if [ "$comp" = daneel -o "$comp" = dors ]
-then
-    used_space=`df / | tail -n 1 | sed 's/.* \([^ ]*\)%.*/\1/g'`
-    if [ "$used_space" -gt 95 ]
-    then
-        echo -n "$used_space% "
-    fi
-fi
 
 function Find1
 {
