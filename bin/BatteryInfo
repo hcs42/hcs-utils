@@ -1,0 +1,68 @@
+#!/usr/bin/python
+
+# Prints battery info and state.
+
+import optparse
+import subprocess
+import re
+
+def parse_args():
+    parser = optparse.OptionParser()
+
+    parser.add_option('-b', '--battery-name', dest='battery_name',
+                      help='Battery name. You can find it out by doing '
+                           '`ls /proc/acpi/battery/`.',
+                      action='store', default='BAT0')
+    parser.add_option('-v', '--verbose', dest='verbose',
+                      help='Verbose output',
+                      action='store_true', default=False)
+
+    (cmdl_options, args) = parser.parse_args()
+    return cmdl_options, args
+
+def main(options, args):
+    state = subprocess.Popen(["cat",
+                              "/proc/acpi/battery/" +
+                              options.battery_name +
+                              "/state"],
+                             stdout=subprocess.PIPE).communicate()[0]
+    if options.verbose:
+        print "BATTERY STATE:"
+        print state
+
+    info = subprocess.Popen(["cat",
+                             "/proc/acpi/battery/" +
+                             options.battery_name +
+                             "/info"],
+                            stdout=subprocess.PIPE).communicate()[0]
+    if options.verbose:
+        print "BATTERY INFO:"
+        print info
+
+    def get_int(attribute, text):
+        """Gets an integer attibute from `text`.
+
+        E.g. if the line
+
+            present rate:            1189 m
+
+        is contained in `text`, and `attibute` is ``"present_rate"``, it will
+        return ``1189``.
+        """
+
+        r = re.search(attribute + r':\s*(\d*)', text)
+        return int(r.group(1))
+
+    present_rate = float(get_int('present rate', state))
+    remaining_cap = float(get_int('remaining capacity', state))
+    remaining_hour = remaining_cap / present_rate
+    remaining_min = int(remaining_hour * 60)
+    max_cap = float(get_int('last full capacity', info))
+
+    remaining_hour_int = (int(remaining_min) / 60)
+    remaining_min_int = (int(remaining_min) % 60)
+    print 'Remaining time: %0.2d:%0.2d' % (remaining_hour_int, remaining_min_int)
+    print 'Percentage: %0.2d%%' % (int(remaining_cap / max_cap * 100),)
+
+if __name__ == '__main__':
+    main(*parse_args())
