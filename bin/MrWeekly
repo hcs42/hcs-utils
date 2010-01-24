@@ -56,11 +56,12 @@ then
 cat << EOF
 import datetime
 d = datetime.date.today()
-thisweek = int(d.strftime('%W')) + 1
+thisweek = d.isocalendar()[1]
 if d.isoweekday() <= 4:
-    print thisweek-1
+    w = thisweek-1
 else:
-    print thisweek
+    w = thisweek
+print '%02d' % thisweek
 EOF
 ) | python)
 fi
