@@ -45,6 +45,8 @@ esac
 
 export EDITOR='gvim -f'
 export HISTFILESIZE=100000
+export HISTSIZE=10000
+export HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S "
 
 # disable CTRL-S suspending the screen
 stty -ixon
