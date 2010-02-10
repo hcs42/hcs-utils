@@ -72,7 +72,6 @@ set -x
 PodcastGetter "G7 ${requested_week}" "${requested_week}"6/14/35-
 PodcastGetter "IK ${requested_week}" "${requested_week}"6/16/04-
 PodcastGetter "RV ${requested_week}" "${requested_week}"6/18/04-30
-PodcastGetter "TV ${requested_week}" "${requested_week}"7/08/30-
 cd "$KABARE_DIR"
 PodcastGetter ":kabare_${requested_week}" "${requested_week}"6/13/05-
 #PodcastGetter ":matine_${requested_week}" "${requested_week}"7/09/05-
