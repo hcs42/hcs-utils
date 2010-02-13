@@ -36,7 +36,7 @@ def get_trashdir_from_file(dir):
         if re.match(sourcedir, dir):
             return trashdir
     return None
-    
+
 def get_trashdir(dir):
     hostname = subprocess.Popen(["hostname"], stdout=subprocess.PIPE).communicate()[0]
     if hostname.strip() == 'giskard':
@@ -96,6 +96,7 @@ def main(options, args):
     if options.info:
         sys.stdout.write('Size of trash in kilobytes: ')
         sys.stdout.flush()
+        abspath = os.path.abspath('.')
         trashdir = get_trashdir(abspath)
         os.system('du -sk '+trashdir+' | cut -f1')
         return
