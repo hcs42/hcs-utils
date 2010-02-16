@@ -82,7 +82,7 @@ alias n='PodcastGetter'
 
 function L
 {
-    echo "[`date '+20%y-%m-%d %H:%M:%S'`]" "$@" >> "/a/cp/hk/hk/hcs/hcslog_`hostname`"
+    echo "[`date '+%Y-%m-%d %H:%M:%S'`]" "$@" >> "/a/cp/hk/hk/hcs/hcslog_`hostname`"
 }
 
 function LE
@@ -593,7 +593,7 @@ function T
     sed -u 's/.*/x\0/g' | \
     while read line
     do
-        echo "[`date "+%m-%d %H:%M:%S"`] ${line:1}"
+        echo "[`date "+%Y-%m-%d %H:%M:%S"`] ${line:1}"
     done
 }
 
