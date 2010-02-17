@@ -30,4 +30,4 @@ case $1 in
         ;;
 esac
 
-while read line; do echo "[`date +%Y-%m-%d %H:%M:%S`] $line"; done
+while read line; do echo "[`date '+%Y-%m-%d %H:%M:%S'`] $line"; done
