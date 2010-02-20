@@ -66,14 +66,14 @@ podcast_dir = '/a/media/audio/flash'
 podcast_log = '/a/media/audio/podcast_log'
 
 dir_dict = {
-    'news': '1news',
-    'mr': '2mr',
-    'comedy': '3comedy',
-    'bbc': '4bbc',
-    'tn': '5tn',
-    'show': '6show',
-    'comp': '7comp',
-    'etc': '8etc',
+    'mr': '1mr',
+    'sci': '2sci',
+    'comp': '3comp',
+    'skept': '4skept',
+    'etc': '5etc',
+    'comedy': '6comedy',
+    'book': '7book',
+    'music': '9music',
 }
 
 dirs = { dir: join(podcast_dir, realdir)
@@ -284,7 +284,7 @@ def handle_bbc(a):
     if match == None:
         return False
 
-    os.chdir(dirs['news'])
+    os.chdir(dirs['mr'])
     g = match.group
     month, day, hour, address = g(1), g(2), g(3), a[0]
     ab = 'b' if int(hour) < 12 else 'c'
@@ -306,26 +306,31 @@ def get_and_reencode(address, mp3file):
     reencode_mp3(mp3file)
 
 podcasts = [
-    ('mr',   '',    mrget,       'http://www.mr1-kossuth.hu/m3u/(.*).m3u'),
-    ('mr',   '',    mrget2,      'http://www.mr1-kossuth.hu/index.php?'),
-    ('bbc',  'sc',  wget,        'http://downloads.bbc.co.uk/podcasts/worldservice/scia'),
-    ('bbc',  'iv',  wget,        'http://downloads.bbc.co.uk/podcasts/worldservice/interview'),
-    ('bbc',  '',    wget,        'http://downloads.bbc.co.uk'),
-    ('tn',   'tn',  wget,        'http://itc.conversationsnetwork.org/.*/ITC.TN'),
-    ('show', 'so',  wget,        'http://itc.conversationsnetwork.org/.*/ITC.SO-Episode'),
-    ('show', 'se',  wget,        'http://media.libsyn.com/media/seradio/seradio-episode(\d\d\d).*mp3'),
-    ('show', 'se',  wget,        'http://feedproxy.google.com/~r/se-radio'),
-    ('show', 'fl',  cut('0:30'), 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/FLOSS-(\d\d\d).mp3'),
-    ('show', 'fl',  cut('0:30'), 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/floss'),
-    ('show', 'lo',  wget,        'http://media.libsyn.com/media/linuxoutlaws/linuxoutlaws(\d\d\d).mp3'),
-    ('show', 'uu',  cut('0:01'), 'http://podcast.ubuntu-uk.org/download/uupc_s(\d\d)e(\d\d)_high.mp3'),
-    ('show', 'sf',  wget,        'http://www.softwarefreedom.org/podcast-media/Software-Freedom-Law-Show'),
-    ('show', 'tr',  get_and_reencode, 'http://www.tuxradar.com/files/podcast/'),
-    ('show', 'sj',  wget,        'http://feedproxy.google.com/~r/ShotOfJaq'),
-    ('show', 'sj',  wget,        'http://audio.lugradio.org/shotofjaq'),
-    ('comp', 'itc', wget,        'http://itc.conversationsnetwork.org'),
-    ('comp', 'itc', wget,        'http://sic.conversationsnetwork.org'),
-    ('etc',  '',    wget,        'http://.*'),
+    ('mr',    '',    mrget,       'http://www.mr1-kossuth.hu/m3u/(.*).m3u'),
+    ('mr',    '',    mrget2,      'http://www.mr1-kossuth.hu/index.php?'),
+    ('sci',   'sc',  wget,        'http://downloads.bbc.co.uk/podcasts/worldservice/scia'),
+    ('sci',   'iv',  wget,        'http://downloads.bbc.co.uk/podcasts/worldservice/interview'),
+    ('sci',   '',    wget,        'http://downloads.bbc.co.uk'),
+    ('sci',   'tn',  wget,        'http://itc.conversationsnetwork.org/.*/ITC.TN'),
+    ('comp',  'so',  wget,        'http://itc.conversationsnetwork.org/.*/ITC.SO-Episode'),
+    ('comp',  'se',  wget,        'http://media.libsyn.com/media/seradio/seradio-episode(\d\d\d).*mp3'),
+    ('comp',  'se',  wget,        'http://feedproxy.google.com/~r/se-radio'),
+    ('comp',  'fl',  cut('0:30'), 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/FLOSS-(\d\d\d).mp3'),
+    ('comp',  'fl',  cut('0:30'), 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/floss'),
+    ('comp',  'lo',  wget,        'http://media.libsyn.com/media/linuxoutlaws/linuxoutlaws(\d\d\d).mp3'),
+    ('comp',  'uu',  cut('0:01'), 'http://podcast.ubuntu-uk.org/download/uupc_s(\d\d)e(\d\d)_high.mp3'),
+    ('comp',  'sf',  wget,        'http://www.softwarefreedom.org/podcast-media/Software-Freedom-Law-Show'),
+    ('comp',  'tr',  get_and_reencode, 'http://www.tuxradar.com/files/podcast/'),
+    ('comp',  'sj',  wget,        'http://feedproxy.google.com/~r/ShotOfJaq'),
+    ('comp',  'sj',  wget,        'http://audio.lugradio.org/shotofjaq'),
+    ('etc',   'itc', wget,        'http://itc.conversationsnetwork.org'),
+    ('etc',   'itc', wget,        'http://sic.conversationsnetwork.org'),
+    ('skept', 'sg',  wget,        'http://media.libsyn.com/media/skepticsguide'),
+    ('skept', 's5',  wget,        'http://media.libsyn.com/media/sgu5x5'),
+    ('skept', 'pi',  wget,        'http://media.libsyn.com/media/pointofinquiry'),
+    ('skept', 'sy',  wget,        'http://media.libsyn.com/media/skepticality'),
+    ('skept', 'sd',  wget,        'http://skeptoid.com'),
+    ('etc',   '',    wget,        'http://.*'),
 ]
 
 def handle_usual(a):
