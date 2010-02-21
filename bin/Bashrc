@@ -474,7 +474,6 @@ if [ -f "$dirs_txt" ]; then
     . /a/docs/hcs/comp/hcs_help/dirs.txt
 fi
 
-alias -- "Fp--"="cd /a/media/audio/flash; pwd; ls {1..8}*"
 alias -- "--"=d
 
 ##### Heapkeeper #####
