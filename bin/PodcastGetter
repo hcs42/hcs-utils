@@ -58,6 +58,21 @@ def weekday_to_datetime(year, week, dayofweek, strf=False):
     else:
         return (result.strftime('%m'), result.strftime('%d'))
 
+def call(cmd):
+    w = sys.stdout.write
+    w('cmd: ')
+
+    for arg in cmd:
+        # we put `arg` between quotes if contains any character like space that
+        # is not mentioned here
+        if re.match('^[-_a-zA-Z0-9./+=:]+$', arg):
+            w(arg)
+        else:
+            w("'%s'" % arg)
+        w(' ')
+    w('\n')
+    subprocess.call(cmd)
+
 ##### Variables #####
 
 join = os.path.join
@@ -88,14 +103,14 @@ def gettempfile():
     return tmpfile
 
 def mkdirp(dir):
-    subprocess.call(['mkdir', '-p', dir])
+    call(['mkdir', '-p', dir])
 
 def gotodir(dir):
     mkdirp(dir)
     os.chdir(dir)
 
 def wget(address, output):
-    subprocess.call(['wget', '-c', address, '-O', output])
+    call(['wget', '-c', address, '-O', output])
 
 def weekday(month, day):
     return datetime.datetime(year, month, day).strftime("%a")
@@ -112,7 +127,7 @@ def find_next(dir):
     return '{0:02}'.format(max+1)
 
 def mrget(address, file):
-    subprocess.call(['MRGET', address, file])
+    call(['MRGET', address, file])
 
 def mrget2(address, file):
     for line in str(urllib.request.urlopen(address).read(), encoding='latin2').split('\n'):
@@ -127,9 +142,9 @@ def mrget2(address, file):
 
 def reencode_mp3(mp3file):
     tmpfile = gettempfile()
-    subprocess.call(['mplayer', '-vo', 'null', '-vc', 'null', '-ao', \
+    call(['mplayer', '-vo', 'null', '-vc', 'null', '-ao', \
                      'pcm:waveheader:fast:file='+tmpfile, mp3file])
-    subprocess.call(['lame', tmpfile, mp3file])
+    call(['lame', tmpfile, mp3file])
 
 def append_to_file(filename, str):
     with open(filename, 'a') as f:
@@ -152,11 +167,11 @@ def get_mr1(month, day):
               '{year}-{month}-{day}-k{hour}.rm'. \
               format(year=year, month=month, day=day, hour=hour, basename=basename)
     wget(address, rm_name)
-    subprocess.call(['mplayer', '-vo', 'null', '-vc', 'null', '-ao', \
+    call(['mplayer', '-vo', 'null', '-vc', 'null', '-ao', \
                      'pcm:waveheader:fast:file='+wav_name, rm_name])
-    subprocess.call(['sox', '-t', 'wav', wav_name, '-t', 'wav', wav2_name, \
+    call(['sox', '-t', 'wav', wav_name, '-t', 'wav', wav2_name, \
                      'trim', '30:10', '59:00'])
-    subprocess.call(['lame', wav2_name, mp3_name])
+    call(['lame', wav2_name, mp3_name])
     os.remove(rm_name)
     os.remove(wav_name)
     os.remove(wav2_name)
@@ -169,16 +184,17 @@ def get_mr1_time(month, day, hour, mp3_name, a=None, b=None):
               '{year}-{month}-{day}-k{hour}.rm'. \
               format(year=year, month=month, day=day, hour=hour)
     wget(address, rm_name)
-    subprocess.call(['mplayer', '-vo', 'null', '-vc', 'null', '-ao', \
+    call(['mplayer', '-vo', 'null', '-vc', 'null', '-ao', \
                      'pcm:waveheader:fast:file='+wav_name, rm_name])
     if a is None:
         wav2_name = basename+'.wav'
     else:
         wav2_name = basename+'2.wav'
-        subprocess.call(['sox', '-t', 'wav', wav_name, '-t', 'wav', wav2_name, \
-                         'trim', a+':10', b+':00'])
+        length = str(int(b) - int(a))
+        call(['sox', '-t', 'wav', wav_name, '-t', 'wav', wav2_name, \
+                         'trim', a+':00', length+':00'])
 
-    subprocess.call(['lame', wav2_name, mp3_name])
+    call(['lame', wav2_name, mp3_name])
     os.remove(rm_name)
     os.remove(wav_name)
     if a is not None:
@@ -210,7 +226,7 @@ def call_cut(mp3name, from_='0:0', to='999:0'):
               '-b', to,
               '-O', mp3name]
     print('Cutting:', params)
-    subprocess.call(params)
+    call(params)
 
 def handle_mr_spec(a):
     if len(a) != 2:
@@ -244,7 +260,7 @@ def handle_mr_spec(a):
         mp3_file = ('%s.mp3' % (a[0][1:],))
     else:
         gotodir(dirs['mr'])
-        mp3_file = join(dir, '%s %s.mp3' % (find_next(dir), a[0]))
+        mp3_file = join(dir, '%s_%s.mp3' % (find_next(dir), a[0]))
     print ('minute_from', minute_from)
     print ('minute_to', minute_to)
     print ('mp3_file', mp3_file)
@@ -297,7 +313,7 @@ def handle_bbc(a):
 def cut(time):
     def get(address, mp3file):
         wget(address, mp3file)
-        subprocess.call(['Cut', mp3file, time])
+        call(['Cut', mp3file, time])
     return get
 
 def get_and_reencode(address, mp3file):
@@ -346,7 +362,7 @@ def handle_usual(a):
         dir = dirs[dir]
         mkdirp(dir)
         address = a[1]
-        mp3_file = join(dir, '%s%s %s.mp3' % (find_next(dir), shortname, a[0]))
+        mp3_file = join(dir, '%s%s_%s.mp3' % (find_next(dir), shortname, a[0]))
         getfun(address, mp3_file)
         append_to_file(podcast_log, today() + ' ')
         append_to_file(podcast_log, mp3_file + '  ')
