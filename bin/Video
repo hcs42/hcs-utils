@@ -49,9 +49,9 @@ OPTIONS
         Start experimental mode.
   Options of 'add':
     -p, --pattern _pattern_
-        The files which match this pattern will be add to the file list.
+        The files which contain this pattern will be add to the file list.
         _pattern_ is a Python regular expression.
-        The default is '.*\\.(mp3|avi|mpeg|mpg)'
+        The default is '\\.(mp3|avi|mpeg|mpg|ogg|flv)'
 EXAMPLES
     Initializing the contents of the directory for playing:
         Video add
@@ -306,7 +306,7 @@ def add_to_playlist(od):
     pattern = od['pattern']
     filenames = []
     for filename in os.listdir('.'):
-        if re.match(pattern, filename) and (filename not in playlist):
+        if re.search(pattern, filename) and (filename not in playlist):
             filenames.append(filename)
     filenames.sort()
     with open('plist','a') as plist_file:
@@ -331,7 +331,7 @@ def main(args):
         od = args_to_od(args, opt_spec)
         (play_exp if od['experimental'] else play)(od)
     elif cmd in ['a','add']:
-        opt_spec = [['pattern','p',1,'.*\\.(mp3|avi|mpeg|mpg)']]
+        opt_spec = [['pattern','p',1,'\\.(mp3|avi|mpeg|mpg|ogg|flv)']]
         od = args_to_od(args, opt_spec)
         add_to_playlist(od)
     elif cmd in ['l','list']:
