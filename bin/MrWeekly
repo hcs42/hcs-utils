@@ -69,13 +69,13 @@ fi
 echo "Requested week: week ${week}"
 
 set -x
-#PodcastGetter "G7" "${week}"6/14/35-
-#PodcastGetter "IK" "${week}"6/16/04-
-#PodcastGetter "ET_a" ${week}2/22/25-
-#PodcastGetter "ET_b" ${week}5/22/25-
-#PodcastGetter "TI" ${week}4/14/35-
-#PodcastGetter "Ut_hetfo" ${week}1/18/02-17
-#PodcastGetter "Ut_kedd" ${week}2/18/02-17
+PodcastGetter "G7" "${week}"6/14/35-
+PodcastGetter "IK" "${week}"6/16/04-
+PodcastGetter "ET_a" ${week}2/22/25-
+PodcastGetter "ET_b" ${week}5/22/25-
+PodcastGetter "TI" ${week}4/14/35-
+PodcastGetter "Ut_hetfo" ${week}1/18/02-17
+PodcastGetter "Ut_kedd" ${week}2/18/02-17
 PodcastGetter "Ut_szerda" ${week}3/18/02-17
 PodcastGetter "Ut_csutortok" ${week}4/18/02-17
 PodcastGetter "Ut_pentek" ${week}5/18/02-17
