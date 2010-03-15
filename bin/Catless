@@ -1,0 +1,73 @@
+#!/usr/bin/python
+
+# Prints the text from the standard input or the given files using `cat` or
+# `less` depending on whether the text fits into the terminal
+
+import optparse
+import os.path
+import subprocess
+import sys
+
+def parse_args():
+    usage = 'Usage: Catless [options] [FILENAME]...'
+    parser = optparse.OptionParser(usage=usage)
+
+    (cmdl_options, args) = parser.parse_args()
+    return cmdl_options, args
+
+def cmd(args):
+    return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()[0]
+
+def main(options, args):
+
+    terminal_height = int(cmd(["tput", "lines"]))
+    text = []
+
+    if len(args) == 0:
+
+        # Reading stdin
+        while True:
+            line = sys.stdin.readline()
+            if line == '':
+                break
+            text.append(line)
+
+    else:
+        filenames = args
+
+        # Checking whether all files exist and are regular
+        all_files_ok = True
+        for filename in filenames:
+            if not os.path.exists(filename):
+                print 'File not found: ', filename
+                all_files_ok=False
+            if not os.path.isfile(filename):
+                print 'Not a regular file: ', filename
+                all_files_ok=False
+        if not all_files_ok:
+            exit(0)
+
+        # Reading the content of all files
+        for filename in filenames:
+            f = open(filename, 'r')
+            while True:
+                line = f.readline()
+                if line == '':
+                    break
+                text.append(line)
+            f.close()
+
+    # If the terminal is taller then the text, we print the text just like
+    # `cat`
+    if len(text) < terminal_height:
+        for line in text:
+            sys.stdout.write(line)
+
+    # Otherwise we use "less" to display it
+    else:
+        process = subprocess.Popen(["less"], stdin=subprocess.PIPE)
+        process.communicate(''.join(text))
+
+
+if __name__ == '__main__':
+    main(*parse_args())
