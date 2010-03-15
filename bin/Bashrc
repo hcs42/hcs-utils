@@ -156,6 +156,7 @@ function GC
 }
 
 alias Gc="git commit"
+alias Gcf="git commit -F hcs/gitcommit"
 
 function GPU
 # $1: thread to push
@@ -404,33 +405,30 @@ alias HL=Helplist
 
 function get_help_file
 {
-    dir="/a/docs/hcs/comp/hcs_help"
-    if [ -e "$dir/$1.txt" ]; then
-        echo "$dir/$1.txt"
-    elif [ -e "$dir/$1.htxt" -o "$2" = "anyway" ]; then
-        echo "$dir/$1.htxt"
+    if [ -e "$HCS_HELP_DIR_1/$1.txt" ]; then
+        echo "$HCS_HELP_DIR_1/$1.txt"
+    elif [ -e "$HCS_HELP_DIR_1/$1.htxt" ]; then
+        echo "$HCS_HELP_DIR_1/$1.htxt"
+    elif [ -e "$HCS_HELP_DIR_2/$1.txt" ]; then
+        echo "$HCS_HELP_DIR_2/$1.txt"
+    elif [ -e "$HCS_HELP_DIR_2/$1.htxt" ]; then
+        echo "$HCS_HELP_DIR_2/$1.htxt"
+    elif [ "$2" = "anyway" ]; then
+        echo "$HCS_HELP_DIR_1/$1.txt"
     fi
 }
 
 function Help
 {
     if [ "$1" = "" ]; then
-        cat "/a/docs/hcs/comp/hcs_help/help.txt"
+        Help "help"
     else
         help_file=`get_help_file "$1" 0`
         if [ "$help_file" = "" ]; then
             echo "Subject '$1' does not exist."
         else
-            cat "$help_file"
+            Catless "$help_file"
         fi
-    fi
-}
-
-function Helpecho
-{
-    help_file=`get_help_file "$1" anyway`
-    if [ "$help_file" != "" ]; then
-        echo "$help_file"
     fi
 }
 
@@ -456,7 +454,7 @@ function Helpfind
 
 function Helplist
 {
-    ls "/a/docs/hcs/comp/hcs_help" | sed 's/\.htxt//g' | sed 's/\.txt//g'
+    ls "$HCS_HELP_DIR_1"  "$HCS_HELP_DIR_2" | sed 's/\.htxt//g' | sed 's/\.txt//g'
 }
 
 ##### hcs dirs #####
@@ -539,6 +537,47 @@ function CP()
             echo Command is not available.
             ;;
     esac
+}
+
+#function myxclipboard
+#{
+#    xclip_cmd="xclip $1"
+#    if [ "$2" != "" ]
+#    then
+#        echo -n "$2" | $xclip_cmd
+#    else
+#        $xclip_cmd
+#    fi
+#}
+#
+#function XC1
+#{
+#    myxclipboard "" "$1"
+#}
+#
+#function XC
+#{
+#    myxclipboard "-selection clipboard" "$1"
+#}
+
+# calls xclip normally
+function XC
+{
+    xclip -selection clipboard "$@"
+}
+
+# prints the contents of the clipboard
+function XP
+{
+    (xclip -selection clipboard -o "$@"; echo) | Catless
+}
+
+# feeds its argument to xclip
+function XA
+{
+    text="$1"
+    shift
+    echo -n "$text" | xclip -selection clipboard "$@"
 }
 
 ##### editing bashrc #####
