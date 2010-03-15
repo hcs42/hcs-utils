@@ -339,6 +339,7 @@ podcasts = [
     ('comp',  'tr',  get_and_reencode, 'http://www.tuxradar.com/files/podcast/'),
     ('comp',  'sj',  wget,        'http://feedproxy.google.com/~r/ShotOfJaq'),
     ('comp',  'sj',  wget,        'http://audio.lugradio.org/shotofjaq'),
+    ('comp',  'lp',  wget,        'http://advocacy.python.org/podcasts/littlebit'),
     ('etc',   'itc', wget,        'http://itc.conversationsnetwork.org'),
     ('etc',   'itc', wget,        'http://sic.conversationsnetwork.org'),
     ('skept', 'sg',  wget,        'http://media.libsyn.com/media/skepticsguide'),
