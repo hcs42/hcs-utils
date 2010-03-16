@@ -265,10 +265,14 @@ function CvsDiff
     minorrev=`echo $rev | cut -d. -f2`
     prevrev="$majorrev.$((minorrev - 1))"
     ((cvs log -r$2 $1 | sed -n '/--------/,/========/p');
-     (cvs diff -ur $prevrev -r $rev $1 | tail -n+7)) | \
-    gview - -c "setf diff"
+     (cvs diff -ur $prevrev -r $rev $1 | tail -n+7))
 }
 
+function CvsDiffG
+{
+    CvsDiff | \
+    gview - -c "setf diff"
+}
 ##### prompt #####
 
 dollar_symbol="\\$"
