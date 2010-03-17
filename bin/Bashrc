@@ -409,17 +409,32 @@ alias HE=Helpedit
 alias HL=Helplist
 
 function get_help_file
+# $1: file name
+# $2: "" or "anyway"
+# $3: "" or "secondary"
 {
-    if [ -e "$HCS_HELP_DIR_1/$1.txt" ]; then
+    if [ "$3" = "secondary" ]
+    then
+        primary=false
+    else
+        primary=true
+    fi
+
+    if [ "$primary" -a '(' -e "$HCS_HELP_DIR_1/$1.txt" ')' ]; then
         echo "$HCS_HELP_DIR_1/$1.txt"
-    elif [ -e "$HCS_HELP_DIR_1/$1.htxt" ]; then
+    elif [ "$primary" -a '(' -e "$HCS_HELP_DIR_1/$1.htxt" ')' ]; then
         echo "$HCS_HELP_DIR_1/$1.htxt"
     elif [ -e "$HCS_HELP_DIR_2/$1.txt" ]; then
         echo "$HCS_HELP_DIR_2/$1.txt"
     elif [ -e "$HCS_HELP_DIR_2/$1.htxt" ]; then
         echo "$HCS_HELP_DIR_2/$1.htxt"
     elif [ "$2" = "anyway" ]; then
-        echo "$HCS_HELP_DIR_1/$1.txt"
+        if $primary
+        then
+            echo "$HCS_HELP_DIR_1/$1.txt"
+        else
+            echo "$HCS_HELP_DIR_2/$1.txt"
+        fi
     fi
 }
 
@@ -439,7 +454,14 @@ function Help
 
 function Helpedit
 {
-    help_file=`get_help_file "$1" anyway`
+    if [ "$2" = 2 ]
+    then
+        secondary=secondary
+    else
+        secondary=""
+    fi
+
+    help_file=`get_help_file "$1" anyway "$secondary"`
     if [ "$help_file" = "" ]; then
         echo "Subject '$1' does not exist."
     else
