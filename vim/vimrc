@@ -53,7 +53,19 @@ nnoremap <down> g<down>
 nnoremap <c-j> <c-e>
 nnoremap <c-k> <c-y>
 
-" Invoking external programs
+nnoremap ,*    :set hls<cr>:let @/="\\<<c-r><c-w>\\>"<cr>
+vnoremap ,*    :<del><del><del><del><del>set hls<cr>:let @/="\\<<c-r>*\\>"<cr>
+nnoremap ,,*   :set hls<cr>:let @/="\\c<c-r><c-w>"<cr>
+vnoremap ,,*   :<del><del><del><del><del>set hls<cr>:let @/="\\c<c-r>*"<cr>
+nnoremap ,v*   :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '<c-r>/'
+vnoremap ,v*   :<del><del><del><del><del>set hls<cr>:let @/="<c-r>*"<cr>:vim '<c-r>*'
+nnoremap ,vw*  :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '\<<c-r>/\>'
+nnoremap ,hw   :execute ":help " . expand("<cword>")<cr>
+
+" -------------------------- "
+" Invoking external programs "
+" -------------------------- "
+
 command! FollowLink call FollowLink()
 function! FollowLink ()
   let line = getline (".")
@@ -287,13 +299,29 @@ function! HRunFileIfExists(file) "{{{
     endif
 endfunction
 
-""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------ "
+" Backup files "
+" ------------ "
 
-nnoremap ,*    :set hls<cr>:let @/="\\<<c-r><c-w>\\>"<cr>
-vnoremap ,*    :<del><del><del><del><del>set hls<cr>:let @/="\\<<c-r>*\\>"<cr>
-nnoremap ,,*   :set hls<cr>:let @/="\\c<c-r><c-w>"<cr>
-vnoremap ,,*   :<del><del><del><del><del>set hls<cr>:let @/="\\c<c-r>*"<cr>
-nnoremap ,v*   :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '<c-r>/'
-vnoremap ,v*   :<del><del><del><del><del>set hls<cr>:let @/="<c-r>*"<cr>:vim '<c-r>*'
-nnoremap ,vw*  :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '\<<c-r>/\>'
-nnoremap ,hw   :execute ":help " . expand("<cword>")<cr>
+if v:version >= 700
+    " If I have a /a/_/folders/vim_backup directory, let that be the backup
+    " directory; otherwise don't back up.
+    " (Vim version earlier than 7.0 don't have the finddir function.)
+    if finddir("/a/_/folders/vim_backup") != ""
+        set bdir=/a/_/folders/vim_backup/
+        set backup
+    else
+        set nobackup
+    endif
+endif
+
+" We set the 'backupext' option to contain the current date and time, so that
+" the name of the backup file will be the concatenation of the name of the
+" normal file and the current date and time.
+function! HRefreshBackup()
+    execute ":set backupext=" . strftime(".%y%m%d_%H%M")
+    " You may want to have %H%M%S instead of %H%M if you want to have the
+    " possibility of having mltiple backups in a minute.
+endfunction
+
+au BufWritePre * call HRefreshBackup()
