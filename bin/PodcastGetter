@@ -6,25 +6,24 @@ help_string = """\
 PodcastGetter
 
 mr1 news:
-    NG <mmdd>
+    PodcastGetter <mmdd>
 mr1 180 perc:
-    NG p<mmdd>
+    PodcastGetter p<mmdd>
 mr1:
-    NG <mmdd>/<HH>
-    NG <mmdd>/<HH>/<MM><MM>
-    NG <wwd>/<HH>
-    NG <wwd>/<HH>/<MM><MM>
-concrete shows:
-    G7: 6/14/35-
-    IdotKerek: 6/16/04-
-    RV: 6/18/04-30
-    Tetszettek volna: 7/08/30-
-    Kabare: 6/13/05-
-    Matine: 7/09/05-
+    PodcastGetter <title> <mmdd>/<HH>
+    PodcastGetter <title> <mmdd>/<HH>/<MM>-      # from MM to 60
+    PodcastGetter <title> <mmdd>/<HH>/-<MM>      # from 0 to MM
+    PodcastGetter <title> <mmdd>/<HH>/<MM>-<MM>
+    PodcastGetter <title> <wwd>/<HH>
+    PodcastGetter <title> <wwd>/<HH>/<MM>-      # from MM to 60
+    PodcastGetter <title> <wwd>/<HH>/-<MM>      # from 0 to MM
+    PodcastGetter <title> <wwd>/<HH>/<MM>-<MM>
 bbc news:
-    NG <link>
+    PodcastGetter <link>
 other:
-    NG <title> <link>
+    PodcastGetter <title> <link>
+
+The name of the output file will be `<title>.mp3`.
 """
 
 import datetime
