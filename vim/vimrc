@@ -328,3 +328,33 @@ function! HRefreshBackup()
 endfunction
 
 au BufWritePre * call HRefreshBackup()
+
+" ---------- "
+" Navigation "
+" ---------- "
+"
+function! NextNav()
+    if s:navigation_type == 0
+        echo "Error navigation"
+        let s:navigation_type = 1
+        noremap <F5>  :cprev<cr>
+        noremap <F6>  :cnext<cr>
+    elseif s:navigation_type == 1
+        echo "Buffer navigation"
+        let s:navigation_type = 2
+        noremap <F5>  :bprev<cr>
+        noremap <F6>  :bnext<cr>
+    else
+        echo "Argument navigation"
+        let s:navigation_type = 0
+        noremap <F5>    :prev<cr>
+        noremap <F6>    :next<cr>
+    endif
+endfunction
+
+" Set Error navigation
+let s:navigation_type = 0
+silent call NextNav()
+
+noremap <c-F12> :call NextNav()<cr>
+command! NextNav call NextNav()
