@@ -43,7 +43,16 @@ esac
 
 ##### settings #####
 
-export EDITOR='gvim -f'
+if [ "$EDITOR" = "" ]
+then
+    export EDITOR='gvim -f'
+fi
+
+if [ "$EDITOR2" = "" ]
+then
+    export EDITOR2="$EDITOR"
+fi
+
 export HISTFILESIZE=100000
 export HISTSIZE=10000
 export HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S "
@@ -320,8 +329,6 @@ function parse_git_branch
     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
 }
 
-PS1="\w\$(parse_git_branch) $ "
-
 p3
 
 ##### emacs #####
@@ -466,7 +473,7 @@ function Helpedit
     if [ "$help_file" = "" ]; then
         echo "Subject '$1' does not exist."
     else
-        gvim "$help_file"
+        $EDITOR2 "$help_file"
     fi
 }
 
@@ -612,7 +619,7 @@ function XA
 
 function EB()
 {
-    gvim -f /a/cp/hcs-utils/bin/Bashrc
+    $EDITOR /a/cp/hcs-utils/bin/Bashrc
     . ~/.bashrc
 }
 
