@@ -70,4 +70,9 @@ def main(options, args):
 
 
 if __name__ == '__main__':
-    main(*parse_args())
+    try:
+        main(*parse_args())
+    except OSError:
+        # The user probably pressed CTRL-C before `less` could read all data.
+        # This is not an error.
+        pass
