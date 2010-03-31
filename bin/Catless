@@ -76,3 +76,6 @@ if __name__ == '__main__':
         # The user probably pressed CTRL-C before `less` could read all data.
         # This is not an error.
         pass
+    except KeyboardInterrupt:
+        # The user probably pressed CTRL-C while Catless was running.
+        pass
