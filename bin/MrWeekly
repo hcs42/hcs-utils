@@ -79,7 +79,5 @@ PodcastGetter "Ut_kedd_${week}" ${week}2/18/02-17
 PodcastGetter "Ut_szerda_${week}" ${week}3/18/02-17
 PodcastGetter "Ut_csutortok_${week}" ${week}4/18/02-17
 PodcastGetter "Ut_pentek_${week}" ${week}5/18/02-17
-PodcastGetter "RV_${week}" "${week}"6/18/04-30
 cd "$KABARE_DIR"
 PodcastGetter ":kabare_${week}" "${week}"6/13/05-
-#PodcastGetter ":matine_${week}" "${week}"7/09/05-
