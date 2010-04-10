@@ -132,6 +132,8 @@ alias Gt='gitk --all &'
 alias Gd='PAGER="" git diff'
 alias GD='PAGER="" git diff | gview -'
 alias Gp='git pull'
+alias Gr='git rebase'
+alias Gri='git rebase -i'
 
 function Gpu
 # $1: thread to push
@@ -219,6 +221,8 @@ then
     complete -o default -o nospace -F _git_log Glt
     complete -o default -o nospace -F _git_log Glr
     complete -o default -o nospace -F _git_push Git-rebranch
+    complete -o default -o nospace -F _git_rebase Gr
+    complete -o default -o nospace -F _git_rebase Gri
 fi
 
 ##### Vim #####
