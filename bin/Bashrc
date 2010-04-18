@@ -45,7 +45,7 @@ esac
 
 if [ "$EDITOR" = "" ]
 then
-    export EDITOR='gvim -f'
+    export EDITOR='vim'
 fi
 
 if [ "$EDITOR2" = "" ]
