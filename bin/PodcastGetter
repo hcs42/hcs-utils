@@ -332,7 +332,7 @@ podcasts = [
     ('comp',  'se',  wget,        'http://feedproxy.google.com/~r/se-radio'),
     ('comp',  'fl',  cut('0:30'), 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/FLOSS-(\d\d\d).mp3'),
     ('comp',  'fl',  cut('0:30'), 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/floss'),
-    ('comp',  'lo',  wget,        'http://media.libsyn.com/media/linuxoutlaws/linuxoutlaws(\d\d\d).mp3'),
+    ('comp',  'lo',  wget,        'linuxoutlaws'),
     ('comp',  'uu',  cut('0:01'), 'http://podcast.ubuntu-uk.org/download/uupc_s(\d\d)e(\d\d)_high.mp3'),
     ('comp',  'sf',  wget,        'http://www.softwarefreedom.org/podcast-media/Software-Freedom-Law-Show'),
     ('comp',  'tr',  get_and_reencode, 'http://www.tuxradar.com/files/podcast/'),
@@ -354,7 +354,7 @@ def handle_usual(a):
         dir, shortname, getfun, template = podcast
 
         # Does the podcast match the template?
-        match = re.match(template, a[1])
+        match = re.search(template, a[1])
         if match == None:
             continue
 
