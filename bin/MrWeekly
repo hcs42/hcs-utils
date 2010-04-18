@@ -73,11 +73,11 @@ PodcastGetter "G7_${week}" "${week}"6/14/35-
 PodcastGetter "IK_${week}" "${week}"6/16/04-
 PodcastGetter "ET_a_${week}" ${week}2/22/25-
 PodcastGetter "ET_b_${week}" ${week}5/22/25-
-PodcastGetter "TI_${week}" ${week}4/14/35-
-PodcastGetter "Ut_hetfo_${week}" ${week}1/18/02-17
-PodcastGetter "Ut_kedd_${week}" ${week}2/18/02-17
-PodcastGetter "Ut_szerda_${week}" ${week}3/18/02-17
-PodcastGetter "Ut_csutortok_${week}" ${week}4/18/02-17
-PodcastGetter "Ut_pentek_${week}" ${week}5/18/02-17
+#PodcastGetter "TI_${week}" ${week}4/14/35-
+#PodcastGetter "Ut_hetfo_${week}" ${week}1/18/02-17
+#PodcastGetter "Ut_kedd_${week}" ${week}2/18/02-17
+#PodcastGetter "Ut_szerda_${week}" ${week}3/18/02-17
+#PodcastGetter "Ut_csutortok_${week}" ${week}4/18/02-17
+#PodcastGetter "Ut_pentek_${week}" ${week}5/18/02-17
 cd "$KABARE_DIR"
 PodcastGetter ":kabare_${week}" "${week}"6/13/05-
