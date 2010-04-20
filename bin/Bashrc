@@ -268,7 +268,7 @@ function Grep
 
 ##### cvs #####
 
-alias CU="cvs -q update -d -P | grep -v '\\(^U\\|is no longer in the repository$\\)'"
+alias CU="cvs -q update -d -P 2>&1 | grep -v '\\(^U\\|is no longer in the repository$\\)'"
 alias CUU="cvs -q update -d -P"
 
 # Example: CvsDiff myfile 1.10
