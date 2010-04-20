@@ -333,7 +333,7 @@ au BufWritePre * call HRefreshBackup()
 " Navigation "
 " ---------- "
 "
-function! NextNav()
+function! NavNext()
     if s:navigation_type == 0
         echo "Error navigation"
         let s:navigation_type = 1
@@ -354,7 +354,11 @@ endfunction
 
 " Set Error navigation
 let s:navigation_type = 0
-silent call NextNav()
+silent call NavNext()
 
-noremap <c-F12> :call NextNav()<cr>
-command! NextNav call NextNav()
+noremap <c-F12> :call NavNext()<cr>
+command! NavNext call NavNext()
+command! NavNext2 call NavNext() | call NavNext()
+
+noremap <F7> :prev<cr>
+noremap <F8> :next<cr>
