@@ -181,24 +181,6 @@ noremap ,bs :buffers<BAR>
            \ let i = input("Buffer number: ")<BAR>
            \ execute "buffer " . i<CR>
 
-" -------------- "
-" ShortTabSearch "
-" -------------- "
-
-function! HMapShortSearch()
-    cnoremap <silent> <cr> <cr>:nohls<cr>:call HMapShortSearchEnd()<cr>
-    cnoremap <silent> <tab> <cr>:nohls<cr>:call HMapShortSearchEnd()<cr>
-    cnoremap <silent> <esc> <c-c>:call HMapShortSearchEnd()<cr>
-endfunction
-
-function! HMapShortSearchEnd()
-    cunmap <cr>
-    cunmap <tab>
-    cunmap <esc>
-endfunction
-
-noremap <tab> :call HMapShortSearch()<cr>/\c
-
 " ----- "
 " nohls "
 " ----- "
