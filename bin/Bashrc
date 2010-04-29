@@ -85,6 +85,8 @@ alias R='ls -R'
 alias PR="killall plasma; plasma >/dev/null 2>/dev/null &"
 alias vmi='vim'
 alias gvmi='gvim'
+alias gerp='grep'
+alias grpe='grep'
 alias n='PodcastGetter'
 alias l='Catless'
 
