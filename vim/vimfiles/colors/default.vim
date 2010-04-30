@@ -14,6 +14,8 @@ endif
 let colors_name = "default"
 
 hi Folded                       guifg=darkblue  guibg=#ffffff
+hi SpellBad term=underline ctermfg=red ctermbg=none
+hi SpellCap term=underline ctermfg=blue ctermbg=none
 
 " Status Line colors
 hi hcsSLFileName guifg=yellow guibg=darkgray
