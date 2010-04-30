@@ -166,7 +166,7 @@ command! ViewOff call ViewOff()
 
 " Makes up a temporary file name and saves the file there.
 
-command! HSave w! `mktemp -p ~/ vim.tmp.XXXXXXXX`
+command! HSave w! `mktemp -p ~/vim.tmp.XXXXXXXX`
 
 " ------------ "
 " BufferOpener "
