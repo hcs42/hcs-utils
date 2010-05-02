@@ -237,6 +237,7 @@ def play(od):
                     call(['MP']+options+[track],
                          stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w'))
                 else:
+                    print('+ ', ['MP']+options+[track])
                     call(['MP']+options+[track])
             if os.path.exists('donotstop') and playnum != None:
                 add_pnum(1)
