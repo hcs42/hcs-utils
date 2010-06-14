@@ -155,7 +155,16 @@ def string_to_file(s,file_name):
 ### pnum
 
 def add_pnum(n):
-    string_to_file(str(max(int(file_to_string('pnum'))+n,1)),'pnum')
+    playlist = read_playlist()
+    pnum_str = file_to_string('pnum')
+    new_pnum = max(int(pnum_str)+n,1)
+    if new_pnum <= len(playlist) + 1:
+        string_to_file(str(new_pnum),'pnum')
+    else:
+        print('Pnum not incremented; it would be too large.\n'
+              'Increment: {0}\n'
+              'Current pnum value: {1}\n'
+              'Playlist length: {2}\n'.format(n, pnum_str, len(playlist)))
 
 def read_pnum():
     return int(file_to_string('pnum'))
@@ -188,8 +197,9 @@ def print_playlist():
     i = 1
     for filename in playlist:
         arrows = (['--> ',' <--'] if pnum == i else ['    ', ''])
-        print('{0}{1}{2}'.format(arrows[0], filename, arrows[1]))
+        print('{0}{1}. {2}{3}'.format(arrows[0], i, filename, arrows[1]))
         i += 1
+    print('pnum={0}'.format(pnum))
 
 ### ppos
 
