@@ -265,7 +265,13 @@ function gm
 
 function Grep
 {
-    grep -r "$@" . | grep -v '^\([^:]*/CVS/[^:]*\|\./tags\|./files.txt\|./files_all.txt\):\|^Binary'
+    exclude='^\([^:]*/CVS/[^:]*\|\./tags\|./files.txt\|./files_all.txt\):\|^Binary'
+    if [ "$#" = 1 ]
+    then
+        echo "Usage: Grep [options] <pattern> <dir>"
+    else
+        grep -r "$@" | grep -v "$exclude"
+    fi
 }
 
 ##### cvs #####
