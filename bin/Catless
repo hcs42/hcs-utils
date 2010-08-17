@@ -41,11 +41,11 @@ def main(options, args):
             if not os.path.exists(filename):
                 print 'File not found: ', filename
                 all_files_ok=False
-            if not os.path.isfile(filename):
+            elif not os.path.isfile(filename):
                 print 'Not a regular file: ', filename
                 all_files_ok=False
         if not all_files_ok:
-            exit(0)
+            sys.exit(0)
 
         # Reading the content of all files
         for filename in filenames:
