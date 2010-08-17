@@ -701,3 +701,8 @@ function Find1
 {
     find -L -name "$@" | sed 1q
 }
+
+function lt
+{
+    ls -lt | head "$@"
+}
