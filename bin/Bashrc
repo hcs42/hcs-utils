@@ -10,7 +10,7 @@ export PATH=\
 "/a/comp/programs/bin:"\
 "$PATH"
 
-export PYTHONPATH=".:/a/cp/python/lib"
+export PYTHONPATH=".:/a/cp/hcs-utils/lib:/a/cp/python/lib"
 
 if [ -e /a/comp/programs/vim/vim_runtime ]; then
     export VIMRUNTIME=/a/comp/programs/vim/vim_runtime
@@ -124,7 +124,7 @@ function TS
     Timestat -H --since 2009-08-03 -i python:perl:wave_ "$@"
 }
 
-export ACTIONFILES=/a/cp/hk/hk/hcs/hcslog_giskard
+export ACTIONFILES=/a/cp/hk/hk/hcs/hcslog_giskard:/a/cp/hk/hk/hcs/hcslog_hcs-virtual
 
 ##### git #####
 
@@ -197,6 +197,14 @@ function Gf
     git fetch attis
 }
 
+# git fetch remote
+function Gfr
+{
+    remotename=$1
+    branch=$2
+    git fetch "$remotename" "$branch:remotes/$remotename/$branch"
+}
+
 ### git log ###
 
 alias Gl='git log --color'
@@ -265,7 +273,7 @@ function gm
 
 function Grep
 {
-    exclude='^\([^:]*/CVS/[^:]*\|\./tags\|./files.txt\|./files_all.txt\):\|^Binary'
+    exclude='^\([^:]*/CVS/[^:]*\|/git/\|\./tags\|./files.txt\|./files_all.txt\):\|^Binary'
     if [ "$#" = 1 ]
     then
         echo "Usage: Grep [options] <pattern> <dir>"
@@ -706,7 +714,13 @@ function Find1
     find -L -name "$@" | sed 1q
 }
 
+<<<<<<< HEAD
 function lt
 {
     ls -lt "$@" | head
+=======
+function DelPyc
+{
+    find -name '*.pyc' | xargs t
+>>>>>>> Bashrc modifications
 }
