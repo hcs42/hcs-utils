@@ -345,6 +345,7 @@ podcasts = [
     ('skept', 'sg',  wget,        'http://media.libsyn.com/media/skepticsguide'),
     ('skept', 's5',  wget,        'http://media.libsyn.com/media/sgu5x5'),
     ('skept', 'pi',  wget,        'http://media.libsyn.com/media/pointofinquiry'),
+    ('skept', 'fg',  wget,        'forgoodreason'),
     ('skept', 'sy',  wget,        'http://media.libsyn.com/media/skepticality'),
     ('skept', 'sd',  wget,        'http://skeptoid.com'),
     ('etc',   '',    wget,        'http://.*'),
