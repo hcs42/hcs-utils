@@ -1,0 +1,202 @@
+#!/bin/bash
+
+# This program rsync:s my data to my external hard disk.
+#
+# See --help and --more-help for more information.
+
+function print_help
+{
+cat <<EOF
+NAME
+    RSync
+USAGE
+    RSync
+DESCRIPTION
+    Synchronizes my data from my internal hard disk to my external hard
+    disk.
+OPTIONS
+    -h, --help
+        This help
+    --more-help
+        More help
+AUTHOR
+    Csaba Hoch <csaba.hoch@gmail.com>
+EOF
+}
+
+function print_more_help
+{
+cat <<EOF
+== Synchronizing the data ==
+
+I have a laptop and two external hard drives. I use the external hard
+drives to back up my data, and to hold my data for which the laptop
+does not have enough space. I use both external hard disk in the same
+way; they have the same directory structure and the same files.
+
+I have two kinds of data: personal data and media data. I use them
+quite differently, so they need to be backed up differently as well.
+
+=== Personal data ===
+
+My personal data is stored in the \$ENCFS_SRC_DIR directory on the
+internal hard drive of my laptop. This directory is encrypted with
+encfs. (This is the mountpoint directory, i.e. it is decrypted.) All
+my personal data is always present on the internal hard disk. (It is a
+few 10 GBs.) It is usual for a file to be changed by me, and files are
+often deleted. It is useful to have a backup of these deleted files
+and the previous versions of the modified files.
+
+There is an rsync target directory (\$ENCFS_TARGET_DIR/master) and an
+rsync backup directory (\$ENCFS_TARGET_DIR/backup) on the external
+hard disks. After a synchronization, the content of the first one is
+identical to the content on \$ENCFS_SRC_DIR on the internal hard disk.
+The second one stores the files that have been deleted from
+\$ENCFS_SRC_DIR, and previous versions of the files that have been
+modified. They are suffixed with the date and time when the rsync was
+started (e.g. myfile.20100905_222616), and are organized in the same
+directory hierarchy as the original files (but under a different root
+directory). rsync could be set to have the backup files in the same
+directories as the original files, but this way e.g. if my laptop's
+internal hard disk dies and I get a new one, it is much easier to
+recover my *current* personal data, I don't have to clean it from a
+bunch of backup files sitting in all around my directory structure.
+
+=== Media data ===
+
+My media data is partly stored on the internal hard disk of my laptop
+(in the \$MEDIA_SRC_DIR directory), and partly on the external hard
+disks (in the \$MEDIA_TARGET_DIR directory). This directories are not
+encrypted. The usual way to store new media data is that it goes first
+to the internal hard disk, and then it gets synchronized to the
+external hard disks. Then when I don't need it in the near future, I
+delete it so that it will be present only on the external hard disks.
+For this system to work, files that were deleted from internal hard
+disk should not be deleted from external hard disks, which means that
+once a file was written to \$MEDIA_TARGET_DIR, it will not be removed
+by synchronization, it can only be removed manually. This way the
+\$MEDIA_SRC_DIR is a subset of the \$MEDIA_TARGET_DIR, except for the
+very new files. Changing an existing file in the media directory is
+quite rare. If I need a file that is present only on the external hard
+disks, I copy it to the internal hard disk.
+
+Most directories in \$MEDIA_SRC_DIR are rsync:ed into
+\$MEDIA_TARGET_DIR. This rsync does not delete any files, and does not
+create backup files either. Deleting would be harmful as described
+earlier, and backups would unnecessary, because there are very few
+changes to existing files.
+
+== Misc ==
+
+=== Exclude file ===
+
+The \$EXCLUDE_FILE file contains the list of files that should not be
+synchronized.
+
+=== Executing 'find' ===
+
+After each synchronization on a media subdirectory, a 'find' will be
+executed on the synchronized target directory. The result will be
+stored in a file in the \$FIND_DIR directory. This way the external
+hard disk do not have to be connected if we want to know whether a
+file is present on it or not.
+EOF
+}
+
+case $1 in
+    -h|--help)
+        print_help
+        exit 0
+        ;;
+    --more-help)
+        print_more_help
+        exit 0
+        ;;
+esac
+
+DATE_TAG=$(date "+%Y%m%d_%H%M%S")
+EXCLUDE_FILE=/a/cp/bash/rsync-exclude
+FIND_DIR=/a/media/_/rsync-find
+
+ENCFS_SRC_DIR=/a/encfs/mountpoint
+ENCFS_TARGET_DIR=/a/links/ext_encfs_mountpoint
+MEDIA_SRC_DIR=/a/media
+MEDIA_TARGET_DIR=/media/hcs_ext/media
+
+function RSyncDir
+    # $1: source dir (should end with a "/")
+    # $2: target dir (should end with a "/")
+    # $3: backup dir (no files are deleted and no backup is made if empty)
+    # $4: name (used to give a name to the "find" file
+{
+    SOURCE="$1"
+    TARGET="$2"
+    BACKUP_DIR="$3"
+    NAME="$4"
+
+    if [ -z "$BACKUP_DIR" ]
+    then
+        rsync -rulpEtv --exclude-from=$EXCLUDE_FILE \
+              "$SOURCE" "$TARGET"
+    elif [ -d "$BACKUP_DIR" ]
+    then
+        rsync -rulpEtv --exclude-from=$EXCLUDE_FILE \
+              --delete --backup --backup-dir="$BACKUP_DIR" \
+              --suffix ".$DATE_TAG" \
+              "$SOURCE" "$TARGET"
+    else
+        echo "Error: BACKUP_DIR does not exist: $BACKUP_DIR"
+        exit 1
+    fi
+}
+
+function RSyncDirMedia
+    # $1: subdirectory in the 'media" directory
+{
+    SUBDIR=$1
+    RSyncDir \
+        "$MEDIA_SRC_DIR/$SUBDIR/" \
+        "$MEDIA_TARGET_DIR/$SUBDIR/" \
+        "" \
+        "$SUBDIR"
+    OLD_PWD=$(pwd)
+    cd "$TARGET"
+    find -type f | sort > "$FIND_DIR/${NAME}"
+    cd "$OLD_PWD"
+}
+
+function main
+    # other rsync options:
+    #     --delete --force --size-only --list-only --exclude "pattern"
+    #     --exclude-from=FILE
+{
+    if [ ! -d "$ENCFS_TARGET_DIR/master" ]
+    then
+        echo "Error: external encfs directory is not mounted!"
+        echo "Use the MountExtEncfs command."
+        exit 1
+    fi
+
+    set -x
+
+    # rsync-ing the encrypted directory.
+    RSyncDir \
+        "$ENCFS_SRC_DIR/" \
+        "$ENCFS_TARGET_DIR/master/" \
+        "$ENCFS_TARGET_DIR/backup" \
+        encfs
+
+    # rsync-ing certain subdirectories of the 'media' directory
+    RSyncDirMedia audio
+    RSyncDirMedia books
+    RSyncDirMedia documentation
+    RSyncDirMedia enc_backup
+    RSyncDirMedia images
+    RSyncDirMedia programs
+    RSyncDirMedia text
+    RSyncDirMedia video
+
+    set +x
+}
+
+main
