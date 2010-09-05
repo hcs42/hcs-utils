@@ -537,7 +537,7 @@ alias -- "--"=d
 function Hk
 {
     Hk-
-    alias T='./test.py'
+    alias T='src/test.py'
 }
 
 ##### clipboard #####
