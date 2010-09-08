@@ -2,7 +2,7 @@
 " Settings "
 " -------- "
 
-set backupskip=
+set backupskip=/tmp/*
 set lazyredraw
 set hidden
 set kp=
