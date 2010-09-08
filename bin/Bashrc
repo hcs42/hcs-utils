@@ -341,7 +341,10 @@ function parse_git_branch
     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
 }
 
-p3
+if [ "$1" != "--noprompt" ]
+then
+    p3
+fi
 
 ##### emacs #####
 
@@ -656,6 +659,7 @@ alias VNC="vncviewer 192.168.0.3:3"
 alias FAH="cd /a/comp/programs/fah; ./fah6"
 alias ssh="ssh -X"
 alias x="xmessage -file ~/.bashrc -nearmouse"
+alias v="view -"
 
 ##### tail #####
 
@@ -704,5 +708,5 @@ function Find1
 
 function lt
 {
-    ls -lt | head "$@"
+    ls -lt "$@" | head
 }
