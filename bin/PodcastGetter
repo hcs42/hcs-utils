@@ -264,6 +264,7 @@ def handle_mr_spec(a):
     print ('minute_to', minute_to)
     print ('mp3_file', mp3_file)
     get_mr1_time(month, day, hour, mp3_file, minute_from, minute_to)
+    append_to_file(podcast_log, today() + ' ')
     return True
 
 def handle_mr_news(a):
