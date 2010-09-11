@@ -48,9 +48,14 @@ then
     export EDITOR='vim'
 fi
 
-if [ "$EDITOR2" = "" ]
+if [ "$HCS_VIM" = "" ]
 then
-    export EDITOR2="$EDITOR"
+    export HCS_VIM="vim"
+fi
+
+if [ "$HCS_VIM_F" = "" ]
+then
+    export HCS_VIM_F="vim"
 fi
 
 export HISTFILESIZE=100000
@@ -99,7 +104,7 @@ function L
 
 function LE
 {
-    gvim "/a/cp/hk/hk/hcs/hcslog_`hostname`"
+    $HCS_VIM "/a/cp/hk/hk/hcs/hcslog_`hostname`"
 }
 
 function LC
@@ -237,36 +242,48 @@ fi
 
 ##### Vim #####
 
-function G
+function v-
 {
-    gview -
+    $HCS_VIM -R -
 }
 
-function GS
-{
-    gvim --servername $1 -c "set titlestring=$1"
-}
-
-function g
-{
-    if [ "$2" = "" ]
-    then
-        gvim "$@"
-    else
-        servername=$1
-        shift
-        gvim --servername $servername --remote-tab "$@"
-    fi
-}
-
-function gm
+function v_start_server
+    # $1: server name
 {
     if [ "$1" = "" ]
     then
-        gvim --servername GVIM
+        servername=main
     else
-        gvim --servername GVIM --remote-tab "$@"
+        servername=$1
     fi
+    $HCS_VIM --servername $servername -c "set titlestring=$servername"
+}
+
+function v
+{
+    if [ "$2" = "" ]
+    then
+        $HCS_VIM "$@"
+    else
+        servername=$1
+        shift
+        $HCS_VIM --servername $servername --remote-tab "$@"
+    fi
+}
+
+function vm
+{
+    $HCS_VIM --servername main --remote-tab "$@"
+}
+
+function v_edit
+{
+    $HCS_VIM -c "E $1"
+}
+
+function vm_edit
+{
+    $HCS_VIM --servername main --remote-send ":Sp $1<cr>"
 }
 
 ##### grep #####
@@ -372,7 +389,7 @@ alias AS='apt-cache search'
 
 function ASG
 {
-    apt-cache search "$1" | gview -
+    apt-cache search "$1" | $VIM -
 }
 
 ##### directory/file handling #####
@@ -398,7 +415,7 @@ alias d=". CdLs"
 
 ##### GW #####
 
-# open a *g*vim with the result of *w*hich
+# open a (g)vim with the result of *w*hich
 function GW
 {
     x=`which $1`
@@ -406,7 +423,7 @@ function GW
     then
         echo "no such thing"
     else
-        gvim "$x"
+        $HCS_VIM "$x"
     fi
 }
 
@@ -496,7 +513,7 @@ function Helpedit
     if [ "$help_file" = "" ]; then
         echo "Subject '$1' does not exist."
     else
-        $EDITOR2 "$help_file"
+        $HCS_VIM "$help_file"
     fi
 }
 
@@ -642,7 +659,7 @@ function XA
 
 function EB()
 {
-    $EDITOR /a/cp/hcs-utils/bin/Bashrc
+    $HCS_VIM_F /a/cp/hcs-utils/bin/Bashrc
     . ~/.bashrc
 }
 
