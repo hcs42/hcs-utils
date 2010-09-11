@@ -731,13 +731,12 @@ function Find1
     find -L -name "$@" | sed 1q
 }
 
-<<<<<<< HEAD
 function lt
 {
     ls -lt "$@" | head
-=======
+}
+
 function DelPyc
 {
     find -name '*.pyc' | xargs t
->>>>>>> Bashrc modifications
 }
