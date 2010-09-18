@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+
+# Prints a sequence of days in the following format:
+# == 2010-09-28 (w38 v) ==
+
+sub print_help() {
+    print <<EOF
+GenDays
+DESCRIPTION
+    Prints a sequence of days in the following format:
+
+        == 2010-09-28 (w38 v) ==
+USAGE
+    GenDays [OPTIONS]
+OPTIONS
+    -h, --help          This help
+EOF
+}
+
+use POSIX qw(strftime mktime);
+
+sub ymd_to_localtime($$$)
+    # Converts a date to a timestamp.
+    #
+    # Arguments:
+    # - $year
+    # - $month
+    # - $day
+    #
+    # Returns: int
+{
+    my ($year, $month, $day) = @_;
+    my @ret = localtime(mktime(0, 0, 0, $day, $month-1, $year-1900));
+    return \@ret;
+}
+
+sub dayname($) {
+    my ($ts) = @_;
+    my $day_index = strftime "%u", @$ts;
+    my @days = ('h', 'k', 'sze', 'cs', 'p', 'szo', 'v');
+    return $days[$day_index - 1];
+}
+
+sub main() {
+
+    my $i = 0;
+    while($i < 30) {
+        my $ts = ymd_to_localtime($year, $month, $day);
+        my $dayname = dayname($ts);
+        print strftime "== %Y-%m-%d (w%V " . $dayname. ") ==\n", @$ts;
+        $day++;
+        $i++;
+    }
+}
+
+($sec,$min,$hour,$day,$month,$year,$wday,$yday,$isdst) = localtime();
+$year += 1900;
+$month += 1;
+
+if (($ARGV[0] eq '-h') or ($ARGV[0] eq '--help')) {
+    print_help();
+    exit();
+}
+
+main();
