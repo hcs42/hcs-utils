@@ -1,0 +1,95 @@
+#!/usr/bin/perl
+
+# Renames the files so that they don't have accents in their names.
+
+use File::Find;
+use File::Basename;
+
+sub print_help() {
+    print <<EOF
+NAME
+    RemoveAccentFromFiles
+USAGE
+    RemoveAccentFromFiles [OPTIONS]
+DESCRIPTION
+    Renames the files and directories recursively in the current so that they
+    don't have accents in their names.
+OPTIONS
+    -h, --help          This help
+EOF
+}
+
+# The script will don't rename any files if this variable is 1.
+my $dry_run = 0;
+
+sub remove_accent_from_str($) {
+    # Returns how the given string should be renamed.
+    #
+    # Argument:
+    # - $s (str) -- String that may have to be renamed.
+    #
+    # Returns: str
+
+    my ($_) = @_;
+    s/á/a/g; s/é/e/g; s/í/i/g; s/ó/o/g; s/ö/o/g; s/ő/o/g; s/ú/u/g; s/ü/u/g;
+    s/ű/u/g; s/Á/A/g; s/É/E/g; s/Í/I/g; s/Ó/O/g; s/Ö/O/g; s/Ő/O/g; s/Ú/U/g;
+    s/Ü/U/g; s/Ű/U/g; s/:/,/g;
+    return $_;
+}
+
+$file_list = [];
+
+sub add_file_to_list {
+    # Adds the content of the $File::Find::name variable to the @$file_list
+    # variable.
+
+    my $fullpath = $File::Find::name;
+    $basename = basename($fullpath,());
+    $dirname  = dirname($fullpath);
+    push @$file_list, {"dirname" => $dirname,
+                       "basename" => $basename};
+}
+
+sub main() {
+
+    # We traverse the directory structure
+    find( \&add_file_to_list, ('.') );
+
+    # We reverse the list because we want to handle leaves first. Consider a
+    # directory "á" containing a directory "é". The traversal result would be
+    # this:
+    #
+    #   á
+    #   á/é
+    #
+    # But if we rename "á" to "a" first, then we can't rename "á/é", because
+    # "á" is not called "á" any more. We can solved this problem by reversing
+    # the traversal order:
+    #
+    #   á/é
+    #   á
+    #
+    # This way we will rename "á/é" to "á/e" first, then rename "á" to "a".
+    @$file_list = reverse(@$file_list);
+
+    foreach $item (@$file_list) {
+        my $dirname = $item->{"dirname"};
+        my $basename = $item->{"basename"};
+        my $new_basename = remove_accent_from_str($basename);
+        if ($new_basename ne $basename) {
+            print "mv $dirname/$basename $dirname/$new_basename\n";
+            if (-e "$dirname/$new_basename") {
+                print "ERROR: file already exists\n";
+            } elsif (!$dry_run) {
+                rename("$dirname/$basename", "$dirname/$new_basename");
+            }
+        }
+    }
+}
+
+if (($ARGV[0] eq '-h') or ($ARGV[0] eq '--help')) {
+    print_help();
+    exit();
+}
+
+main()
