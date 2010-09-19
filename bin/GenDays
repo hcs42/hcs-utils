@@ -5,13 +5,14 @@
 
 sub print_help() {
     print <<EOF
-GenDays
+NAME
+    GenDays
+USAGE
+    GenDays [OPTIONS]
 DESCRIPTION
     Prints a sequence of days in the following format:
 
         == 2010-09-28 (w38 v) ==
-USAGE
-    GenDays [OPTIONS]
 OPTIONS
     -h, --help          This help
 EOF
