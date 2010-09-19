@@ -36,12 +36,15 @@ w = sys.stdout.write
 def quote(s):
     return '"%s"' % (re.sub('"', '\\"', s))
 
+def str_len(s):
+    return len(s.decode('utf8'))
+
 def print_file(output):
     l = [quote(d) for d in os.listdir('.')]
     l.sort()
-    max_len = max([len(d) for d in l])
+    max_len = max([str_len(d) for d in l])
     for d in l:
-        output('mv %s %s%s\n' % (d, ' ' * (max_len - len(d)), d))
+        output('mv %s %s%s\n' % (d, ' ' * (max_len - str_len(d)), d))
 
 def main():
     temp, tempname = tempfile.mkstemp()
