@@ -1,20 +1,6 @@
 #!/bin/bash
 
-# local stuff
-
-export PATH=\
-"/a/cp/margitka:"\
-"/a/cp/hcs-utils/bin:"\
-"/a/cp/python/bin:"\
-"/a/cp/bash/bin:"\
-"/a/comp/programs/bin:"\
-"$PATH"
-
-export PYTHONPATH=".:/a/cp/hcs-utils/lib:/a/cp/python/lib"
-
-if [ -e /a/comp/programs/vim/vim_runtime ]; then
-    export VIMRUNTIME=/a/comp/programs/vim/vim_runtime
-fi
+# My .bashrc
 
 ##### Computer dependent stuff #####
 

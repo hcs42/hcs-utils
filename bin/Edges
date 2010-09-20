@@ -1,0 +1,51 @@
+#!/usr/bin/perl
+
+# Prints the head and the tail of the standard input.
+
+my $head_line_count = 10;
+my $tail_line_count = 10;
+
+sub print_help() {
+    print <<EOF
+NAME
+    Edges
+USAGE
+    Edges [OPTIONS]
+DESCRIPTION
+    Prints the head and the tail of the standard input.
+OPTIONS
+    -h, --help          This help
+EOF
+}
+
+sub main() {
+
+    my $i = 0;
+    my @tail_lines = ();
+
+    while (<STDIN>) {
+        if ($i < $head_line_count) {
+            print;
+        } else {
+            if (scalar(@tail_lines) == $tail_line_count) {
+                shift @tail_lines;
+            };
+            push @tail_lines, $_;
+        }
+        $i++;
+    }
+
+    my $lines_left = $i - $tail_line_count - $head_line_count;
+    if ($lines_left > 0) {
+        print "[...$lines_left more...]\n";
+    }
+
+    print @tail_lines;
+}
+
+if (($ARGV[0] eq '-h') or ($ARGV[0] eq '--help')) {
+    print_help();
+    exit();
+}
+
+main()

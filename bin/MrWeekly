@@ -1,4 +1,4 @@
-#x!/bin/bash
+#!/bin/bash
 
 # Downloads all interesting radio programmes from radio Kossuth on the given
 # week.
@@ -72,12 +72,12 @@ set -x
 PodcastGetter "IK_${week}" "${week}"6/16/04-
 PodcastGetter "G7_${week}" "${week}"6/14/35-
 #PodcastGetter "TI_${week}" ${week}4/14/35-
-PodcastGetter "Ut_a_${week}" ${week}1/12/30-
-PodcastGetter "Ut_b_${week}" ${week}2/12/30-
-PodcastGetter "Ut_c_${week}" ${week}3/12/30-
-PodcastGetter "Ut_d_${week}" ${week}4/12/30-
-PodcastGetter "Ut_e_${week}" ${week}5/12/30-
-PodcastGetter "ET_a_${week}" ${week}2/22/25-
+## PodcastGetter "Ut_a_${week}" ${week}1/12/30-
+## PodcastGetter "Ut_b_${week}" ${week}2/12/30-
+## PodcastGetter "Ut_c_${week}" ${week}3/12/30-
+## PodcastGetter "Ut_d_${week}" ${week}4/12/30-
+## PodcastGetter "Ut_e_${week}" ${week}5/12/30-
+## PodcastGetter "ET_a_${week}" ${week}2/22/25-
 PodcastGetter "ET_b_${week}" ${week}5/22/25-
 #PodcastGetter "Sz_a_${week}" ${week}1/18/02-17
 #PodcastGetter "Sz_b_${week}" ${week}2/18/02-17
