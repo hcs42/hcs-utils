@@ -32,7 +32,6 @@ vnoremap ,cw :<c-u>%s/<c-r>*/<c-r>*/g<left><left>
 noremap ,c*w :*s/\<<c-r>=expand("<cword>")<cr>\>/<c-r>=expand("<cword>")<cr>/g<left><left>
 cnoremap <c-s> \_s\+
 noremap <c-w>O :WinFullScreen<cr>
-noremap <c-w>o :ZoomWin<cr>
 noremap ,m `m
 noremap ,cl :set cul!<cr>
 noremap ,cc :set cuc!<cr>
