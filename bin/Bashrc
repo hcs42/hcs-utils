@@ -122,23 +122,9 @@ export ACTIONFILES=/a/cp/hk/hk/hcs/hcslog_giskard:/a/cp/hk/hk/hcs/hcslog_hcs-vir
 alias Gs='git status'
 alias Gco='git checkout'
 alias Gt='gitk --all &'
-alias Gd='PAGER="" git diff'
-alias GD='PAGER="" git diff | gview -'
-alias Gp='git pull'
-alias Gr='git rebase'
 alias Gri='git rebase -i'
-
-function Gpu
-# $1: thread to push
-{
-    p="grep XXPUSH *.py *.txt"
-    xxx=`$p 2>/dev/null`
-    if [ "$xxx" = "" ]; then
-        git push origin "$1"
-    else
-        $p 2>/dev/null
-    fi
-}
+alias Gcp='git cherry-pick'
+alias Gd='PAGER="" git diff'
 
 function Gb
 {
@@ -162,25 +148,6 @@ function GC
 
 alias Gc="git commit"
 alias Gcf="git commit -F hcs/gitcommit"
-
-function GPU
-# $1: thread to push
-{
-    echo "git pull:"
-    gitpullresult="$(git pull)"
-    echo $gitpullresult
-    if [ "$gitpullresult" = "Already up-to-date." ]; then
-        echo "git push:"
-        Gpu "$1"
-    fi
-}
-
-function Git-rebranch
-{
-    branch=$1
-    git push origin :$branch
-    git push origin $branch
-}
 
 function Gf
 {
@@ -380,6 +347,12 @@ function ASG
 
 ##### directory/file handling #####
 
+function Cd
+{
+    mkdir -p "$1"
+    cd "$1"
+}
+
 function CD
 {
     mkdir -p "$1"
@@ -535,14 +508,6 @@ fi
 
 alias -- "--"=d
 
-##### Heapkeeper #####
-
-function Hk
-{
-    Hk-
-    alias T='src/test.py'
-}
-
 ##### clipboard #####
 
 # putting the argument to the clipboard
@@ -670,7 +635,6 @@ alias VNC="vncviewer 192.168.0.3:3"
 alias FAH="cd /a/comp/programs/fah; ./fah6"
 alias ssh="ssh -X"
 alias x="xmessage -file ~/.bashrc -nearmouse"
-alias v="view -"
 
 ##### tail #####
 
