@@ -6,7 +6,7 @@ use File::Find;
 use File::Basename;
 
 sub print_help() {
-    print <<EOF
+    print <<EOF;
 NAME
     RemoveAccentFromFiles
 USAGE
@@ -16,6 +16,27 @@ DESCRIPTION
     don't have accents in their names.
 OPTIONS
     -h, --help          This help
+    -c, --cmd CMD       Command to be executed on files instead of removing
+                        accents. This can be any Perl expression. The old
+                        filename is placed in the \$_ variable, and the new
+                        filename shall be placed there as well.
+    -v, --verbose       Be verbose
+EXAMPLES
+    Remove accents from all files:
+        \$ RemoveAccentFromFiles
+    Remove some accents from all files:
+        \$ RemoveAccentFromFiles --cmd 's/á/a/;s/é/e/g;s/í/i/g'
+    Convert all uppercase letters to lowercase:
+        \$ RemoveAccentFromFiles --cmd '\$_ = lc(\$_)'
+    Two ways to add a ".old" extension to the name of each file:
+        \$ RemoveAccentFromFiles --cmd 's/\$/.old/'
+        \$ RemoveAccentFromFiles --cmd '\$_ .= ".old"'
+    Two ways to remove the ".old" extentation from each file:
+        \$ RemoveAccentFromFiles --cmd 's/.old\$//'
+        \$ RemoveAccentFromFiles \\\
+              --cmd 'if(/.old\$/){\$_=substr(\$_,0,length(\$_)-4)}'
+AUTHOR
+    Csaba Hoch <csaba.hoch\@gmail.com>
 EOF
 }
 
@@ -31,9 +52,9 @@ sub remove_accent_from_str($) {
     # Returns: str
 
     my ($_) = @_;
-    s/á/a/g; s/é/e/g; s/í/i/g; s/ó/o/g; s/ö/o/g; s/ő/o/g; s/ú/u/g; s/ü/u/g;
-    s/ű/u/g; s/Á/A/g; s/É/E/g; s/Í/I/g; s/Ó/O/g; s/Ö/O/g; s/Ő/O/g; s/Ú/U/g;
-    s/Ü/U/g; s/Ű/U/g; s/:/,/g;
+    print "Old filename: $_\n" if ($verbose);
+    eval $cmd;
+    print "New filename: $_\n" if ($verbose);
     return $_;
 }
 
@@ -92,4 +113,22 @@ if (($ARGV[0] eq '-h') or ($ARGV[0] eq '--help')) {
     exit();
 }
 
-main()
+use Getopt::Long;
+$cmd = <<EOF;
+    s/á/a/g; s/é/e/g; s/í/i/g; s/ó/o/g; s/ö/o/g; s/ő/o/g; s/ú/u/g; s/ü/u/g;
+    s/ű/u/g; s/Á/A/g; s/É/E/g; s/Í/I/g; s/Ó/O/g; s/Ö/O/g; s/Ő/O/g; s/Ú/U/g;
+    s/Ü/U/g; s/Ű/U/g; s/:/,/g;
+EOF
+$help = 0;
+$verbose = 0;
+$result = GetOptions ("help" => \$help,
+                      "cmd=s" => \$cmd,
+                      "verbose" => \$verbose);
+exit(1) if !$result;
+if ($help) {
+    print_help();
+    exit(0);
+}
+
+print "Command: $cmd\n" if ($verbose);
+main();
