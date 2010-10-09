@@ -137,6 +137,7 @@ function RSyncDir
     if [ -z "$BACKUP_DIR" ]
     then
         rsync -rulpEtv --exclude-from=$EXCLUDE_FILE \
+              --size-only \
               "$SOURCE" "$TARGET"
     elif [ -d "$BACKUP_DIR" ]
     then
