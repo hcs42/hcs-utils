@@ -160,7 +160,7 @@ function Gfr
 {
     remotename=$1
     branch=$2
-    git fetch "$remotename" "$branch:remotes/$remotename/$branch"
+    git fetch -f "$remotename" "$branch:remotes/$remotename/$branch"
 }
 
 ### git log ###
