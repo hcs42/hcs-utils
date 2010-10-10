@@ -1,0 +1,3 @@
+#!/bin/bash
+
+vnstat -d|perl -e '$sum=0;while(<STDIN>){if(/^ +(\d\d)\/(\d\d)\/(\d\d).+?\|.+?\| +([^ ]+?) +([^ ]+?) +\|/){$s=$4;if($5 eq "GiB"){$s*=1024}elsif($5 ne "MiB"){$s=1}; $sum+=$s;print "$1$2$3 $4 $5 -> $s\n"}}; print "Sum: $sum MiB\n"'
