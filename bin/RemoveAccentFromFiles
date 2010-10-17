@@ -20,6 +20,7 @@ OPTIONS
                         accents. This can be any Perl expression. The old
                         filename is placed in the \$_ variable, and the new
                         filename shall be placed there as well.
+    -d, --dry-run       Don't actually rename anything.
     -v, --verbose       Be verbose
 EXAMPLES
     Remove accents from all files:
@@ -39,9 +40,6 @@ AUTHOR
     Csaba Hoch <csaba.hoch\@gmail.com>
 EOF
 }
-
-# The script will don't rename any files if this variable is 1.
-my $dry_run = 0;
 
 sub remove_accent_from_str($) {
     # Returns how the given string should be renamed.
@@ -117,13 +115,15 @@ use Getopt::Long;
 $cmd = <<EOF;
     s/á/a/g; s/é/e/g; s/í/i/g; s/ó/o/g; s/ö/o/g; s/ő/o/g; s/ú/u/g; s/ü/u/g;
     s/ű/u/g; s/Á/A/g; s/É/E/g; s/Í/I/g; s/Ó/O/g; s/Ö/O/g; s/Ő/O/g; s/Ú/U/g;
-    s/Ü/U/g; s/Ű/U/g; s/:/,/g;
+    s/Ü/U/g; s/Ű/U/g; s/:/_/g; s/\\?/_/g; s/"/'/g;
 EOF
 $help = 0;
 $verbose = 0;
+$dry_run = 0;
 $result = GetOptions ("help" => \$help,
                       "cmd=s" => \$cmd,
-                      "verbose" => \$verbose);
+                      "verbose" => \$verbose,
+                      "dry-run" => \$dry_run);
 exit(1) if !$result;
 if ($help) {
     print_help();
