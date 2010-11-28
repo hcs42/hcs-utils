@@ -123,8 +123,17 @@ alias Gs='git status'
 alias Gco='git checkout'
 alias Gt='gitk --all &'
 alias Gri='git rebase -i'
-alias Gcp='git cherry-pick'
 alias Gd='PAGER="" git diff'
+
+function Gcp
+{
+    set -x
+    for commit in "$@"
+    do
+        git cherry-pick "$commit"
+    done
+    set +x
+}
 
 function Gb
 {
@@ -214,19 +223,19 @@ function v_start_server
 
 function v
 {
-    if [ "$2" = "" ]
-    then
-        $HCS_VIM "$@"
-    else
-        servername=$1
-        shift
-        $HCS_VIM --servername $servername --remote-tab "$@"
-    fi
+    $HCS_VIM "$@"
 }
 
 function vm
 {
     $HCS_VIM --servername main --remote-tab "$@"
+}
+
+function vs
+{
+    servername=$1
+    shift
+    $HCS_VIM --servername $1 --remote-tab "$@"
 }
 
 function v_edit
@@ -237,6 +246,11 @@ function v_edit
 function vm_edit
 {
     $HCS_VIM --servername main --remote-send ":Sp $1<cr>"
+}
+
+function vs_edit
+{
+    $HCS_VIM --servername "$1" --remote-send ":Sp $2<cr>"
 }
 
 ##### grep #####
