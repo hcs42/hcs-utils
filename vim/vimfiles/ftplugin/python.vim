@@ -6,9 +6,8 @@ setlocal tw=79
 
 setlocal comments=n:#
 
-" Run test.py when I say :make, highlight the correct lines and enable me to
-" jump to those.
-set makeprg=./test.py
+" By default, assume that a unittest is in makeprg, and highlight the correct
+" lines (and enable me to jump to those) according to this.
 setlocal efm=\ \ File\ \"%f\"\\,\ line\ %l%m
 
 " gD is normally "go to the definition of the global thing under the cursor",
