@@ -12,6 +12,7 @@ set noswapfile
 set complete=.,w
 set notimeout
 set ttimeout
+set ignorecase smartcase
 
 if version >= 700
     set statusline=%{expand('%:p:h')}/%#hcsSLFileName#%t%##\ %h%m\ %L\ %=%#hcsSLBufferNumber#%n%##\ %#hcsSLWindowNumber#%{winnr()}%##%#hcsSLFileName#%##\ %#hcsSLFileLineNumber#%l%#hcsSLLineColNumber#\ %v
@@ -19,10 +20,18 @@ endif
 
 let g:is_bash = 1
 
+if has('persistent_undo')
+    if finddir("/a/_/folders/vim_undodir") != ""
+        se undofile
+        se undodir=/a/_/folders/vim_undodir
+    endif
+endif
+
 " -------- "
 " Mappings "
 " -------- "
 
+noremap - /
 noremap ,<cr> :%s/<c-v><cr>/<cr>
 noremap <s-PageUp> <c-w><up>
 noremap <s-PageDown> <c-w><down>
