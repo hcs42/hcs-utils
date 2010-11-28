@@ -175,8 +175,9 @@ def get_mr1_time(month, day, hour, mp3_name, a=None, b=None):
     a = get_int(a, 0)
     b = get_int(b, 60)
     max_kb = (b - a) * 500
-    url = ("http://stream001.radio.hu:8500/stream/%s%s%s_%s%.2d00_1.mp3" %
+    url = ("http://stream001.radio.hu:443/stream/%s%s%s_%s%.2d00_1.mp3" %
            (year, month, day, hour, a))
+    print('url: ' + url)
     get_url(url, mp3_name, max_kb)
 
 def call_cut(mp3name, from_='0:0', to='999:0'):
@@ -269,6 +270,9 @@ podcasts = [
     ('sci',   'iv',  wget,        'http://downloads.bbc.co.uk/podcasts/worldservice/interview'),
     ('sci',   '',    wget,        'http://downloads.bbc.co.uk'),
     ('sci',   'tn',  wget,        'conversationsnetwork.*ITC.TN'),
+    ('sci',   'st',  wget,        'pheedo'),
+    ('sci',   'sw',  wget,        'guardian'),
+    ('sci',   'ns',  wget,        'Naked_Scientists'),
     ('comp',  'so',  wget,        'conversationsnetwork.*ITC.SO'),
     ('comp',  'se',  wget,        'http://media.libsyn.com/media/seradio/seradio-episode(\d\d\d).*mp3'),
     ('comp',  'se',  wget,        'http://feedproxy.google.com/~r/se-radio'),
@@ -282,13 +286,14 @@ podcasts = [
     ('comp',  'sj',  wget,        'http://audio.lugradio.org/shotofjaq'),
     ('comp',  'lp',  wget,        'http://advocacy.python.org/podcasts/littlebit'),
     ('comp',  'fp',  wget,        'frompythonimportpodcast.com'),
+    ('comp',  'ff',  wget,        'softwarefreedom.org'),
     ('etc',   'itc', wget,        'http://itc.conversationsnetwork.org'),
     ('etc',   'itc', wget,        'http://sic.conversationsnetwork.org'),
-    ('skept', 'sg',  wget,        'http://media.libsyn.com/media/skepticsguide'),
-    ('skept', 's5',  wget,        'http://media.libsyn.com/media/sgu5x5'),
-    ('skept', 'pi',  wget,        'http://media.libsyn.com/media/pointofinquiry'),
+    ('skept', 'sg',  wget,        'skepticsguide'),
+    ('skept', 's5',  wget,        'sgu5x5'),
+    ('skept', 'pi',  wget,        'pointofinquiry'),
     ('skept', 'fg',  wget,        'forgoodreason'),
-    ('skept', 'sy',  wget,        'http://media.libsyn.com/media/skepticality'),
+    ('skept', 'sy',  wget,        'skepticality'),
     ('skept', 'sd',  wget,        'http://skeptoid.com'),
     ('etc',   '',    wget,        'http://.*'),
 ]
