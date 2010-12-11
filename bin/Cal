@@ -1,0 +1,21 @@
+#!/usr/bin/python
+
+# Print the current date.
+
+import datetime
+import optparse
+
+def parse_args():
+    usage = ('Usage: Cat [options]\n'
+             'Description: prints the current date.')
+    parser = optparse.OptionParser(usage=usage)
+    (cmdl_options, args) = parser.parse_args()
+    return cmdl_options, args
+
+def main(options, args):
+    d = datetime.date.today()
+    print '%s-%s-%s' % (d.year, d.month, d.day)
+    print '%s-w%s-%s' % d.isocalendar()
+
+if __name__ == '__main__':
+    main(*parse_args())
