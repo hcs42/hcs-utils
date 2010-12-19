@@ -163,7 +163,8 @@ def get_url(url, filename, max_kb):
         s = f.read(quantum * 1024)
         g.write(s)
         kb += quantum
-        sys.stdout.write('%s kbyte (from %s) ' % (kb, max_kb))
+        dt_str = datetime.datetime.now().strftime("%H:%M:%S")
+        sys.stdout.write('[%s] %s kbyte (from %s) ' % (dt_str, kb, max_kb))
         sys.stdout.flush()
     g.close()
     sys.stdout.write('\n')
