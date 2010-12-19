@@ -1,0 +1,110 @@
+#!/usr/bin/python
+
+# Reorganizes footnotes in an email.
+
+import optparse
+import sys
+import re
+
+example = '''\n
+An example usage of the program.
+
+Here is the input file that has the unsorted footnote references:
+
+    $ cat input.mail
+    I have read an article [4] about
+    people who don't like robots [1].
+    Not liking robots is very stupid
+    according to several studies [5][6],
+    but unfortunately none of them
+    is either good [2] or conclusive [9].
+
+    [1] http://robot_disklike
+    [5] http://stupid_robot_dislike
+    [6] http://disliking_is_stupid
+    [0] http://not_referenced_link
+    [2] http://bad_studies
+    [4] http://article
+    [9] http://non_conclusive_studies
+
+We execute the program:
+
+    $ SortFootnotes <input.mail >output.mail
+
+In the resulted file, the footnote are reindexed so that they increase from 1
+as the text goes:
+
+    $ cat output.mail
+    I have read an article [1] about
+    people who don't like robots [2].
+    Not liking robots is very stupid
+    according to several studies [3][4],
+    but unfortunately none of them
+    is either good [5] or conclusive [6].
+
+    [2] http://robot_disklike
+    [3] http://stupid_robot_dislike
+    [4] http://disliking_is_stupid
+    [7] http://not_referenced_link
+    [5] http://bad_studies
+    [1] http://article
+    [6] http://non_conclusive_studies
+
+The footnotes themselves are not resorted, so you should do something like
+':sort n' in Vim on them. SortFootnotes does not distinguish between footnote
+references and footnotes themselves; it only work with numbers in brackets and
+only modifies them.'''
+
+def process_line(line, d):
+    w = sys.stdout.write
+    while True:
+        r = re.search(r'^(.*?)\[(\d+)\](.*)$', line)
+        if r is None:
+            w(line)
+            break
+        before, footnote_index, line = r.groups()
+        #print '>>>', d, '|||' , before, '|||', footnote_index, '|||', line
+        w(before)
+        w('[')
+        footnote_index = int(footnote_index)
+        if footnote_index in d:
+            w(str(d[footnote_index]))
+        else:
+            new_footnote_index = d['next']
+            w(str(new_footnote_index))
+            d[footnote_index] = new_footnote_index
+            d['next'] += 1
+            #w( '{{'+ str(d)+ '}}')
+        w(']')
+    w('\n')
+
+def process_input():
+    d = {'next': 1}
+    while True:
+        line = sys.stdin.readline()
+        if line == '':
+            break
+        line = re.sub(r'[\r\n]*$', '', line)
+        process_line(line, d)
+
+def parse_args():
+    usage = ('Usage: SortFootnotes [options]\n'
+             'Description: sorts footnotes in an email contained in a '
+             'text file.')
+    parser = optparse.OptionParser(usage=usage)
+
+    parser.add_option('--print-example', dest='print_example',
+                      help='Prints an example about what the program does',
+                      action='store_true', default=False)
+
+    (cmdl_options, args) = parser.parse_args()
+    return cmdl_options, args
+
+def main(options, args):
+    if options.print_example:
+        print example
+    else:
+        process_input()
+
+if __name__ == '__main__':
+    main(*parse_args())
