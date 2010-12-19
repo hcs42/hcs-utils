@@ -235,7 +235,7 @@ function vs
 {
     servername=$1
     shift
-    $HCS_VIM --servername $1 --remote-tab "$@"
+    $HCS_VIM --servername $servername --remote-tab "$@"
 }
 
 function v_edit
