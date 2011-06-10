@@ -30,18 +30,12 @@ def get_trashdir_list_from_file():
     f.close()
     return trashdir_list
 
-def get_trashdir_from_file(dir):
+def get_trashdir(dir):
     trashdir_list = get_trashdir_list_from_file()
     for sourcedir, trashdir in trashdir_list:
         if re.match(sourcedir, dir):
             return trashdir
     return None
-
-def get_trashdir(dir):
-    hostname = subprocess.Popen(["hostname"], stdout=subprocess.PIPE).communicate()[0]
-    if hostname.strip() == 'mwlx428':
-        return '/home/ecsahoc/tmp'
-    return get_trashdir_from_file(dir)
 
 class HCSExc:
     def __init__(self,message):
