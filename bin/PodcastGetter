@@ -5,10 +5,6 @@
 help_string = """\
 PodcastGetter
 
-mr1 news:
-    PodcastGetter <mmdd>
-mr1 180 perc:
-    PodcastGetter p<mmdd>
 mr1:
     PodcastGetter <title> <mmdd>/<HH>
     PodcastGetter <title> <mmdd>/<HH>/<MM>-      # from MM to 60
@@ -18,6 +14,9 @@ mr1:
     PodcastGetter <title> <wwd>/<HH>/<MM>-      # from MM to 60
     PodcastGetter <title> <wwd>/<HH>/-<MM>      # from 0 to MM
     PodcastGetter <title> <wwd>/<HH>/<MM>-<MM>
+  Note:
+    A ':' can be prepended to the first argument in which case the file will be
+    downloaded into the current directory.
 bbc news:
     PodcastGetter <link>
 other:
@@ -267,6 +266,7 @@ def get_and_reencode(address, mp3file):
 podcasts = [
     ('mr',    '',    mrget,       'http://www.mr1-kossuth.hu/m3u/(.*).m3u'),
     ('mr',    '',    mrget2,      'http://www.mr1-kossuth.hu/index.php?'),
+    ('mr',    '',    wget,        'mr1fullspeed'),
     ('sci',   'sc',  wget,        'http://downloads.bbc.co.uk/podcasts/worldservice/scia'),
     ('sci',   'iv',  wget,        'http://downloads.bbc.co.uk/podcasts/worldservice/interview'),
     ('sci',   '',    wget,        'http://downloads.bbc.co.uk'),
@@ -274,7 +274,7 @@ podcasts = [
     ('sci',   'st',  wget,        'pheedo'),
     ('sci',   'sw',  wget,        'guardian'),
     ('sci',   'ns',  wget,        'Naked_Scientists'),
-    ('comp',  'so',  wget,        'conversationsnetwork.*ITC.SO'),
+    ('comp',  'so',  wget,        'stack-exchange'),
     ('comp',  'se',  wget,        'http://media.libsyn.com/media/seradio/seradio-episode(\d\d\d).*mp3'),
     ('comp',  'se',  wget,        'http://feedproxy.google.com/~r/se-radio'),
     ('comp',  'fl',  cut('0:30'), 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/FLOSS-(\d\d\d).mp3'),
@@ -282,12 +282,14 @@ podcasts = [
     ('comp',  'lo',  wget,        'linuxoutlaws'),
     ('comp',  'uu',  cut('0:01'), 'http://podcast.ubuntu-uk.org/download/uupc_s(\d\d)e(\d\d)_high.mp3'),
     ('comp',  'sf',  wget,        'http://www.softwarefreedom.org/podcast-media/Software-Freedom-Law-Show'),
-    ('comp',  'tr',  get_and_reencode, 'http://www.tuxradar.com/files/podcast/'),
+    ('comp',  'tr',  wget, 'http://www.tuxradar.com/files/podcast/'),
+    #('comp',  'tr',  get_and_reencode, 'http://www.tuxradar.com/files/podcast/'),
     ('comp',  'sj',  wget,        'http://feedproxy.google.com/~r/ShotOfJaq'),
     ('comp',  'sj',  wget,        'http://audio.lugradio.org/shotofjaq'),
     ('comp',  'lp',  wget,        'http://advocacy.python.org/podcasts/littlebit'),
     ('comp',  'fp',  wget,        'frompythonimportpodcast.com'),
     ('comp',  'ff',  wget,        'softwarefreedom.org'),
+    ('comp',  'sr',  wget,        'startups-for'),
     ('etc',   'itc', wget,        'http://itc.conversationsnetwork.org'),
     ('etc',   'itc', wget,        'http://sic.conversationsnetwork.org'),
     ('skept', 'sg',  wget,        'skepticsguide'),
