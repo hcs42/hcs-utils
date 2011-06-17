@@ -1,12 +1,12 @@
 #!/usr/bin/python
 
-# Print the current date.
+# Prints the current date.
 
 import datetime
 import optparse
 
 def parse_args():
-    usage = ('Usage: Cat [options]\n'
+    usage = ('Usage: Cal [options]\n'
              'Description: prints the current date.')
     parser = optparse.OptionParser(usage=usage)
     (cmdl_options, args) = parser.parse_args()
