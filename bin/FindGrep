@@ -1,4 +1,35 @@
 #!/bin/bash
 
-find . -type f | grep -v '\(/CVS/\|/tags\|/files.txt\|/files_all.txt\|\.beam$\|\.fm$\)' | xargs -d'\n' grep "$@" | grep -v '^Binary file'
-#'^\([^:]*/CVS/[^:]*\|\./tags\|./files.txt\|./files_all.txt\):\|^Binary'
+# Greps recursively in test files (it ignores a few of them)
+
+function print_help
+{
+cat <<EOF
+NAME
+    FindGrep
+USAGE
+    FindGrep [grep options] pattern
+DESCRIPTION
+    Greps recursively in test files (it ignores a few of them)
+EXAMPLE
+    $ FindGrep -i 'io:format'
+OPTIONS
+    -h, --help
+        This help
+    All other options will be passed to grep.
+AUTHOR
+    Csaba Hoch <csaba.hoch@gmail.com>
+EOF
+}
+
+case $1 in
+    -h|--help)
+        print_help
+        exit
+        ;;
+esac
+
+find . -type f | \
+    grep -v '\(/CVS/\|/tags\|/files.txt\|/files_all.txt\|\.beam$\|\.fm$\)' | \
+    xargs -d'\n' grep "$@" | \
+    grep -v '^Binary file'
