@@ -30,6 +30,6 @@ case $1 in
 esac
 
 find . -type f | \
-    grep -v '\(/CVS/\|/tags\|/files.txt\|/files_all.txt\|\.beam$\|\.fm$\)' | \
+    grep -v '\(/CVS/\|/tags\|/files.txt\|/files_all.txt\|\.beam$\|\.fm$\|/.git/\)' | \
     xargs -d'\n' grep "$@" | \
     grep -v '^Binary file'
