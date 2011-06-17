@@ -1,0 +1,4 @@
+#!/bin/bash
+
+find . -type f | grep -v '\(/CVS/\|/tags\|/files.txt\|/files_all.txt\|\.beam$\|\.fm$\)' | xargs -d'\n' grep "$@" | grep -v '^Binary file'
+#'^\([^:]*/CVS/[^:]*\|\./tags\|./files.txt\|./files_all.txt\):\|^Binary'
