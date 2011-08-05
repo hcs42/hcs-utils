@@ -6,14 +6,8 @@ help_string = """\
 PodcastGetter
 
 mr1:
-    PodcastGetter <title> <mmdd>/<HH>
-    PodcastGetter <title> <mmdd>/<HH>/<MM>-      # from MM to 60
-    PodcastGetter <title> <mmdd>/<HH>/-<MM>      # from 0 to MM
-    PodcastGetter <title> <mmdd>/<HH>/<MM>-<MM>
-    PodcastGetter <title> <wwd>/<HH>
-    PodcastGetter <title> <wwd>/<HH>/<MM>-      # from MM to 60
-    PodcastGetter <title> <wwd>/<HH>/-<MM>      # from 0 to MM
-    PodcastGetter <title> <wwd>/<HH>/<MM>-<MM>
+    PodcastGetter <title> <mmdd>/<HH>:<MM>+<M...>
+    PodcastGetter <title> <wwd>/<HH>:<MM>+<M...>
   Note:
     A ':' can be prepended to the first argument in which case the file will be
     downloaded into the current directory.
@@ -169,14 +163,10 @@ def get_url(url, filename, max_kb):
     sys.stdout.write('\n')
     sys.stdout.flush()
 
-def get_mr1_time(month, day, hour, mp3_name, a=None, b=None):
-    def get_int(x, default):
-        return default if x is None else int(x)
-    a = get_int(a, 0)
-    b = get_int(b, 60)
-    max_kb = (b - a) * 500
+def get_mr1_time(month, day, hour, minute, length, mp3_name):
+    max_kb = length * 500
     url = ("http://stream001.radio.hu:443/stream/%s%s%s_%s%.2d00_1.mp3" %
-           (year, month, day, hour, a))
+           (year, month, day, hour, minute))
     print('url: ' + url)
     get_url(url, mp3_name, max_kb)
 
@@ -195,13 +185,13 @@ def call_cut(mp3name, from_='0:0', to='999:0'):
 def handle_mr(a):
     if len(a) != 2:
         return False
-    mr_match = re.match(r'(\d+)/(\d\d)(/(\d\d)?-(\d\d)?)?$', a[1])
+    mr_match = re.match(r'(\d+)/(\d\d):(\d\d)\+(\d+)$', a[1])
     if mr_match is None:
         return False
 
     g = mr_match.group
-    date, hour, minute_from, minute_to = \
-        g(1), g(2), g(4), g(5)
+    date, hour, minute, length = \
+        g(1), g(2), int(g(3)), int(g(4))
 
     if len(date) == 3:
         g = re.match(r'(\d\d)(\d)$', date).group
@@ -214,21 +204,17 @@ def handle_mr(a):
     else:
         return False
 
-    if minute_from is None:
-        minute_from = '0'
-    if minute_to is None:
-        minute_to = '60'
-
     dir = dirs['mr']
     if a[0][0] == ':':
         mp3_file = ('%s.mp3' % (a[0][1:],))
     else:
         gotodir(dirs['mr'])
         mp3_file = join(dir, '%s_%s.mp3' % (find_next(dir), a[0]))
-    print ('minute_from', minute_from)
-    print ('minute_to', minute_to)
+    print ('hour', hour)
+    print ('minute', minute)
+    print ('length', length)
     print ('mp3_file', mp3_file)
-    get_mr1_time(month, day, hour, mp3_file, minute_from, minute_to)
+    get_mr1_time(month, day, hour, minute, length, mp3_file)
     append_to_file(podcast_log, today() + ' ')
     return True
 
@@ -275,6 +261,7 @@ podcasts = [
     ('sci',   'sw',  wget,        'guardian'),
     ('sci',   'ns',  wget,        'Naked_Scientists'),
     ('comp',  'so',  wget,        'stack-exchange'),
+    ('comp',  'so',  wget,        'StackExchange'),
     ('comp',  'se',  wget,        'http://media.libsyn.com/media/seradio/seradio-episode(\d\d\d).*mp3'),
     ('comp',  'se',  wget,        'http://feedproxy.google.com/~r/se-radio'),
     ('comp',  'fl',  cut('0:30'), 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/FLOSS-(\d\d\d).mp3'),
