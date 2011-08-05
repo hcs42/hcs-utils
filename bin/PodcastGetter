@@ -71,7 +71,7 @@ def call(cmd):
 join = os.path.join
 year = datetime.datetime.today().year
 podcast_dir = '/a/media/audio/flash'
-podcast_log = '/a/media/audio/podcast_log'
+podcast_log = '/home/hcs/podcast_log'
 
 dir_dict = {
     'mr': '1mr',
