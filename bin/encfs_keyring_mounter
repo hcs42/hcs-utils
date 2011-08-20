@@ -1,0 +1,64 @@
+#!/usr/bin/python
+
+import os
+import sys
+import subprocess
+import optparse
+import getpass
+from PyKDE4.kdeui import KWallet
+from PyQt4 import QtGui
+
+def open_wallet(verbose=False):
+    app = QtGui.QApplication(sys.argv)
+    wallet = KWallet.Wallet.openWallet(KWallet.Wallet.LocalWallet(), 0)
+    if not wallet.hasFolder('encfs_keyring_mounter'):
+        wallet.createFolder('encfs_keyring_mounter')
+    wallet.setFolder('encfs_keyring_mounter')
+    if verbose:
+        print 'Wallet opened'
+    return wallet
+
+def get_password(wallet):
+    key, q_password = wallet.readPassword('1')
+    password = str(q_password) # converting from PyQt4.QtCore.QString
+    return str(q_password)
+
+def set_password(wallet, password):
+    wallet.writePassword('1', password)
+
+def mount_encfs(password):
+    prg = ['encfs', '--stdinpass', '/a/encfs/root/', '/a/encfs/mountpoint/']
+    p = subprocess.Popen(prg, stdin=subprocess.PIPE)
+    p.communicate(password)
+
+def parse_args():
+    usage = (
+        'Usage:\n'
+        '  encfs_keyring_mounter [options] set -- Set password\n'
+        '  encfs_keyring_mounter [options] get -- Get password\n'
+        '  encfs_keyring_mounter [options] -- Mount the encrypted file system\n'
+        'Description: mounts an encfs directory using kwallet for password '
+        'storage')
+    parser = optparse.OptionParser(usage=usage)
+
+    parser.add_option('-v', '--verbose', dest='verbose',
+                      help='Verbose output',
+                      action='store_true', default=False)
+
+    (cmdl_options, args) = parser.parse_args()
+    return cmdl_options, args
+
+def main(options, args):
+    if args == []:
+        wallet = open_wallet(options.verbose)
+        password = get_password(wallet)
+        mount_encfs(password)
+    elif args == ['set']:
+        wallet = open_wallet(options.verbose)
+        password = getpass.getpass()
+        set_password(wallet, password)
+    elif args == ['get']:
+        print get_password(open_wallet(options.verbose))
+
+if __name__ == '__main__':
+    main(*parse_args())
