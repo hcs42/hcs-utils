@@ -69,14 +69,8 @@ fi
 echo "Requested week: week ${week}"
 
 set -x
-PodcastGetter "IK_${week}" "${week}"6/16/04-
-PodcastGetter "G7_${week}" "${week}"6/14/35-
-PodcastGetter "Ut_a_${week}" ${week}1/12/30-
-PodcastGetter "Ut_b_${week}" ${week}2/12/30-
-PodcastGetter "Ut_c_${week}" ${week}3/12/30-
-PodcastGetter "Ut_d_${week}" ${week}4/12/30-
-PodcastGetter "Ut_e_${week}" ${week}5/12/30-
-PodcastGetter "ET_a_${week}" ${week}2/22/25-
-PodcastGetter "ET_b_${week}" ${week}5/22/25-
+PodcastGetter "vo_g7_${week}" "${week}"6/14:03+75
+PodcastGetter "ET_a_${week}" ${week}2/22:25+35
+PodcastGetter "ET_b_${week}" ${week}5/22:25+35
 cd "$KABARE_DIR"
-PodcastGetter ":kabare_${week}" "${week}"6/13/05-
+PodcastGetter ":kabare_${week}" "${week}"6/13:00+60
