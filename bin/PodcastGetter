@@ -277,6 +277,7 @@ podcasts = [
     ('comp',  'fp',  wget,        'frompythonimportpodcast.com'),
     ('comp',  'ff',  wget,        'softwarefreedom.org'),
     ('comp',  'sr',  wget,        'startups-for'),
+    ('comp',  'oa',  wget,        'onarchitecture'),
     ('etc',   'itc', wget,        'http://itc.conversationsnetwork.org'),
     ('etc',   'itc', wget,        'http://sic.conversationsnetwork.org'),
     ('skept', 'sg',  wget,        'skepticsguide'),
