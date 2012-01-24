@@ -11,11 +11,6 @@
 syn clear
 "hi clear -- why?
 
-syn include @wpcCPlusPlus <sfile>:p:h/cpp.vim
-"syn region wpcCppRegion start=/^ / skip=/\$/ end=/\n\n/ contains=@wpcCPlusPlus
-"C++-section is terminated with an empty line (a line that does not contain
-"anyhing - neither whitespaces)
-
 "syn match wpcBasicText "[^]'\[^=]\+" transparent contains=@Spell
 syn match wpcBasicText "[^']\[^=<]\+" transparent contains=@Spell
 syn region wpcHtml start="<..\{-}>" end="</..\{-}>"
