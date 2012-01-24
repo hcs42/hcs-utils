@@ -10,17 +10,17 @@ case $comp in
 
         function DVI
         {
-            kdvi "$1" >/dev/null 2>/dev/null &
+            kdvi "$@" >/dev/null 2>/dev/null &
         }
 
         function PDF
         {
-            evince "$1" >/dev/null 2>/dev/null &
+            okular "$@" >/dev/null 2>/dev/null &
         }
 
         function PS
         {
-            kghostview "$1" >/dev/null 2>/dev/null &
+            kghostview "$@" >/dev/null 2>/dev/null &
         }
 
         alias mp="mplayer -fs"
@@ -44,8 +44,8 @@ then
     export HCS_VIM_F="vim"
 fi
 
-export HISTFILESIZE=100000
-export HISTSIZE=10000
+export HISTFILESIZE=1000000
+export HISTSIZE=100000
 export HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S "
 
 # disable CTRL-S suspending the screen
@@ -427,6 +427,7 @@ function note
 
 alias H=Help
 alias HE=Helpedit
+alias HF=Helpfind
 alias HL=Helplist
 
 function get_help_file
