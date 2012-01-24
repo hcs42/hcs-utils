@@ -46,9 +46,7 @@ function! HNoAccent()
     silent! *s/\%VŰ/U/g
 endfunction
 
-inoremap <a-d> <c-o>de
 noremap é :
-cnoremap é :
 map ű <c-w>O
 noremap Ű <c-6>
 noremap <a-q> gq}
