@@ -164,7 +164,7 @@ def get_url(url, filename, max_kb):
     sys.stdout.flush()
 
 def get_mr1_time(month, day, hour, minute, length, mp3_name):
-    max_kb = length * 500
+    max_kb = length * 750
     url = ("http://stream001.radio.hu:443/stream/%s%s%s_%s%.2d00_1.mp3" %
            (year, month, day, hour, minute))
     print('url: ' + url)
