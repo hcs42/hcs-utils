@@ -37,16 +37,10 @@ syn case match
 if ! exists ("erlang_characters")
 
     " Basic elements
-    syn match   erlangComment          "%.*$" contains=erlangAnnotation,erlangTodo,erlangListItem
-    syn match   erlangSuperComment1     "%%%%* =============.*$" contains=erlangAnnotation,erlangTodo
-    syn match   erlangSuperComment2     "%%%%* -------------.*$" contains=erlangAnnotation,erlangTodo
-    syn match   erlangAnnotation       " \@<=@\%(clear\|docfile\|end\|headerfile\|type\|author\|copyright\|doc\|reference\|see\|since\|title\|version\|deprecated\|hidden\|private\|equiv\|spec\|throws\)" contained
-    syn region  erlangListItem         start="<li>" end="</li>" contains=erlangListItem,erlangAnnotation,erlangTodo contained
-    syn region  erlangAnnotation       start="<code>" end="</code>" contained
-    syn region  erlangAnnotation       start="{@link" end="}" contained
+    syn match   erlangComment          "%.*$" contains=erlangAnnotation,erlangTodo
+    syn match   erlangAnnotation       " \@<=@\%(clear\|docfile\|end\|headerfile\|todo\|TODO\|type\|author\|copyright\|doc\|reference\|see\|since\|title\|version\|deprecated\|hidden\|private\|equiv\|spec\|throws\)" contained
     syn match   erlangAnnotation       "`[^']*'" contained
-    syn region  erlangAnnotation       start="```" end="'''" contained
-    syn keyword erlangTodo             TODO FIXME XXX todo contained
+    syn keyword erlangTodo             TODO FIXME XXX contained
     syn match   erlangModifier         "\~\a\|\\\a\|\\\\" contained
     syn match   erlangSpecialCharacter ":\|_\|@\|\\\|\"\|\."
     syn match   erlangSeparator        "(\|)\|{\|}\|\[\|]\||\|||\|;\|,\|?\|->\|#" contained
@@ -129,7 +123,7 @@ endif
 
 if ! exists ("erlang_keywords")
     " Constants and Directives
-    syn match   erlangDirective  "-behaviour\|-behaviour"
+    syn match   erlangDirective  "-behaviour\|-behavior"
     syn match   erlangDirective  "-compile\|-define\|-else\|-endif\|-export\|-file"
     syn match   erlangDirective  "-ifdef\|-ifndef\|-import\|-include_lib\|-include"
     syn match   erlangDirective  "-module\|-record\|-undef"
@@ -142,9 +136,7 @@ if ! exists ("erlang_keywords")
     syn keyword erlangKeyword    let of query receive
     syn keyword erlangKeyword    when
     syn keyword erlangKeyword    try
-endif
 
-if ! exists ("erlang_special_atoms")
     " Processes
     syn keyword erlangProcess    creation current_function dictionary
     syn keyword erlangProcess    group_leader heap_size high initial_call
@@ -179,9 +171,6 @@ if ! exists ("erlang_special_atoms")
     syn keyword erlangSignal     badsig kill killed exit normal
 endif
 
-" hcs {
-syn keyword erlangExtra      badarg nocookie false fun true
-" } hcs
 
 
 " Define the default highlighting.
@@ -235,9 +224,6 @@ if version >= 508 || !exists ("did_erlang_inits")
     delcommand HiLink
 endif
 
-hi erlangSuperComment1 guibg=green guifg=blue ctermbg=green ctermfg=4
-hi erlangSuperComment2 guibg=#c0ffc0 guifg=blue ctermbg=green ctermfg=4
-hi erlangListItem guifg=darkblue
 
 let b:current_syntax = "erlang"
 
