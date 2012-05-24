@@ -1,7 +1,9 @@
 " vim:fenc=utf-8
 
-" Fontos digraph-ok: {{{
-"
+" ------------- "
+" Some digraphs "
+" ------------- "
+
 " "o/"  ø    "=="  ⇔    "Ob"  ∘    "!="  ≠
 " "j3"  ϵ    "FA"  ∀    "Sb"  ∙    "=3"  ≡
 " "5r"  ⅴ    "dP"  ∂    "RT"  √    "=<"  ≤
@@ -14,7 +16,18 @@
 " "UD"  ↕    "*P"  ∏    "OR"  ∨    ")C"  ⊃
 " "<="  ⇐    "+Z"  ∑    "(U"  ∩    "(_"  ⊆
 " "=>"  ⇒    "*-"  ∗    ")U"  ∪    ")_"  ⊇
-" }}}
+
+" -------- "
+" Mappings "
+" -------- "
+
+noremap é :
+noremap Ű <c-6>
+noremap ű <c-^>
+
+" ------------------- "
+" Converter functions "
+" ------------------- "
 
 function! HLatin1()
     silent! %s/ő/ô/g
@@ -46,11 +59,7 @@ function! HNoAccent()
     silent! *s/\%VŰ/U/g
 endfunction
 
-noremap é :
-map ű <c-w>O
-noremap Ű <c-6>
-noremap <a-q> gq}
-vnoremap <a-q> gq
+command! HNoAccent call HNoAccent()
 
 function! EoDoAccent()
     silent! %s/cx/ĉ/g
@@ -79,8 +88,3 @@ function! EoRemoveAccent()
     silent! %s/Ĵ/Jx/g
     silent! %s/Ŝ/Sx/g
 endfunction
-
-noremap ű <c-^>
-noremap ú gw}
-noremap Ú gwap
-inoremap ×c <c-g>u<esc>:call HDoCompletion()<cr>s
