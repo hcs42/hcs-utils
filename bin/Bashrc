@@ -25,6 +25,13 @@ case $comp in
 
         alias mp="mplayer -fs"
         ;;
+    *)
+        function PDF
+        {
+            evince "$@" >/dev/null 2>/dev/null &
+        }
+        alias mp="mplayer -fs"
+        ;;
 esac
 
 ##### settings #####
@@ -55,10 +62,6 @@ stty -ixon
 
 alias q=exit
 alias c=clear
-alias CO='./configure'
-alias mak='make'
-alias MCA="make clean && make all"
-alias xb='xset -b'
 alias '..'='cd ..'
 alias '...'='cd ../..'
 alias '....'='cd ../../..'
@@ -66,56 +69,16 @@ alias '.....'='cd ../../../..'
 alias '......'='cd ../../../../..'
 alias '.......'='cd ../../../../../..'
 alias '........'='cd ../../../../../../..'
-alias K='krusader --left . >/dev/null 2>/dev/null &'
 alias ll='ls -lA'
 alias cp="cp -i"
 alias mv="mv -i"
 alias GQ="gqview 1>/dev/null 2>/dev/null &"
 alias ls="ls --color=auto"
-alias R='ls -R'
-alias PR="killall plasma; plasma >/dev/null 2>/dev/null &"
 alias vmi='vim'
 alias gvmi='gvim'
 alias gerp='grep'
 alias grpe='grep'
-alias n='PodcastGetter'
 alias l='Catless'
-
-##### Timestat #####
-
-function L
-{
-    echo "[`date '+%Y-%m-%d %H:%M:%S'`]" "$@" >> "/a/cp/hk/hk/hcs/hcslog_`hostname`"
-}
-
-function LE
-{
-    $HCS_VIM "/a/cp/hk/hk/hcs/hcslog_`hostname`"
-}
-
-function LC
-{
-    if [ "$1" = "" ]
-    then
-        len=20
-    else
-        len="$1"
-    fi
-    cat /a/cp/hk/hk/hcs/hcslog_giskard | tail -n "$len"
-}
-
-function s
-{
-    L stop
-}
-
-function TS
-{
-    DaysSince 2009-08-03
-    Timestat -H --since 2009-08-03 -i python:perl:wave_ "$@"
-}
-
-export ACTIONFILES=/a/cp/hk/hk/hcs/hcslog_giskard:/a/cp/hk/hk/hcs/hcslog_hcs-virtual
 
 ##### git #####
 
