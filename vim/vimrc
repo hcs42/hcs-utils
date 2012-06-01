@@ -1,3 +1,6 @@
+" vim: fenc=utf-8
+" Character test: ûáéúõóüöíÛÁÉÚÕÓÜÖÍ
+
 " -------- "
 " Settings "
 " -------- "
@@ -110,6 +113,10 @@ nnoremap <down> g<down>
 nnoremap <c-j> <c-e>
 nnoremap <c-k> <c-y>
 nnoremap ,hw  :execute ":help " . expand("<cword>")<cr>
+noremap ,sy :echo synIDattr(synID(line('.'),col('.'),1),'name')<cr>
+noremap ,ft :setf <c-r>=&ft<cr><cr>
+noremap ,cd :exec "lcd ".expand('%:p:h')<cr>
+noremap ,CD :exec "cd ".expand('%:p:h')<cr>
 
 " Mappings regarding settings
 noremap ,cl :set cul!<cr>
@@ -157,21 +164,12 @@ vnoremap ,cw :<c-u>%s/<c-r>*/<c-r>*/g<left><left>
 noremap ,c*w :*s/\<<c-r>=expand("<cword>")<cr>\>/<c-r>=expand("<cword>")<cr>/g<left><left>
 noremap ,<space> :%s/ \+$/<cr>
 
-" -------------------------- "
-" Invoking external programs "
-" -------------------------- "
-
-command! FollowLink call FollowLink()
-function! FollowLink ()
-  let line = getline (".")
-  let line = matchstr (line, '\%(http://\|https://\|www\.\)[^ ,;\t]*')
-  let line = substitute(line, '#', '\\#', 'g')
-  exec "!/a/cp/bash/bin/FOLLOW_LINK '".line. "'"
-endfunction
-map <Leader>w :call FollowLink()<CR>
-
-command! Krusader silent !krusader --left . &
-command! Konsole silent !konsole &
+" Unmap confusing commands
+noremap Q <nop>
+noremap <s-up> <nop>
+noremap <s-down> <nop>
+noremap <s-left> <nop>
+noremap <s-right> <nop>
 
 " --------- "
 " Underline "
@@ -219,52 +217,6 @@ endfunction
 
 command! -nargs=? HCW call HCW(<args>)
 
-" -------------- "
-" ViewOn/ViewOff "
-" -------------- "
-
-" ViewOn/ViewOff:
-"   Turns on and off "view" mode in which the cursor is hidden. In "normal
-"   viewmode", the up and down arrows will scroll the screen.
-" Examples:
-"   :ViewOn   " view mode on
-"   :ViewOff  " view mode off
-function! ViewOn()
-    noremap <down> <c-e>
-    noremap <up> <c-y>
-    highlight Cursor gui=NONE guifg=NONE guibg=NONE
-endfunction
-function! ViewOff()
-    unmap <down>
-    unmap <up>
-    highlight Cursor gui=NONE guifg=bg guibg=fg
-endfunction
-
-function! ViewOn2()
-    highlight Cursor gui=NONE guifg=NONE guibg=NONE
-endfunction
-function! ViewOff2()
-    highlight Cursor gui=NONE guifg=bg guibg=fg
-endfunction
-
-command! ViewOn2 call ViewOn2()
-command! ViewOff2 call ViewOff2()
-command! ViewOn call ViewOn()
-command! ViewOff call ViewOff()
-
-" ------------ "
-" BufferOpener "
-" ------------ "
-
-" Lists the buffers and opens the selected one.
-
-noremap <a-2> :buffers<BAR>
-           \ let i = input("Buffer number: ")<BAR>
-           \ execute "buffer " . i<CR>
-noremap ,bs :buffers<BAR>
-           \ let i = input("Buffer number: ")<BAR>
-           \ execute "buffer " . i<CR>
-
 " ----- "
 " nohls "
 " ----- "
@@ -311,7 +263,7 @@ command! PureFileNameToClipboard let @+=expand('%:t') | let @*=@+
 " ,vl - Executed the current line
 function! HRunVisual(mode) range
     if a:mode=='n'
-        exec "normal! gvy\"*"
+        exec "normal! gvy"
     else
         exec "normal! \<esc>"
     endif
@@ -322,69 +274,17 @@ vnoremap ,vv :call HRunVisual('v')<cr>
 nnoremap ,vv :call HRunVisual('n')<cr>
 noremap <silent> ,vl yy:@"<cr>
 
-" ------------------------------- "
-" Editing files in the quick list "
-" ------------------------------- "
-
-" Finds the given file and edits it.
-"
-" Place a list like this in your vimrc:
-"     if version >= 700
-"         let g:hcs_quickfilelist = [
-"         \    [ 'vimrc',  $MYVIMRC],
-"         \    [ 'email', '/home/me/docs/email.txt'],
-"         \]
-"     endif
-" Examples:
-"     :E vimrc
-"     :Sp email
-if version >= 700
-function! E(f, edit)
-    let f = "none"
-    for item in g:hcs_quickfilelist
-        if item[0] == a:f
-            let f = item[1]
-            break
-        endif
-    endfor
-    if f == "none"
-        echo "Unknown file: " . a:f
-    elseif a:edit == 'edit'
-        execute 'edit ' . f
-    else
-        execute 'split ' . f
-    endif
-endfunction
-
-command! -nargs=1 E call E('<args>', 'edit')
-command! -nargs=1 SP call E('<args>', 'split')
-command! -nargs=1 Sp call E('<args>', 'split')
-endif
-
-" ------------------------------ "
-"  Running a script if it exists "
-" ------------------------------ "
-
-function! HRunFileIfExists(file) "{{{
-    if v:version>=700 && filereadable(a:file)
-        exec "source ".a:file
-    endif
-endfunction
-
 " --------------------- "
 " Backup files settings "
 " --------------------- "
 
-if v:version >= 700
-    " If I have a /a/_/folders/vim_backup directory, let that be the backup
-    " directory; otherwise don't back up.
-    " (Vim version earlier than 7.0 don't have the finddir function.)
-    if finddir("/a/_/folders/vim_backup") != ""
-        set bdir=/a/_/folders/vim_backup/
-        set backup
-    else
-        set nobackup
-    endif
+if v:version >= 700 && exists("g:hcs_backupdir")
+    " If I have a hcs_backup directory, let that be the backup directory;
+    " otherwise don't back up.
+    let &bdir = g:hcs_backupdir
+    set backup
+else
+    set nobackup
 endif
 
 " We set the 'backupext' option to contain the current date and time, so that
@@ -516,3 +416,57 @@ function! HMano(a)
     exec "Man " . a:a
     silent only
 endfunction
+
+" ---------
+" Templates
+" ---------
+
+function! HTemplate() "{{{
+    if &filetype == "erlang"
+        let module_name = substitute(bufname('%'),'\.erl$','','g')
+        put! = '-module('.module_name.').'
+        put  = \"-author('csaba.hoch@gmail.com').\"
+        put  = '-compile(export_all).'
+        put  = ''
+    elseif &filetype == "cpp"
+        put! = '#include <iostream>'
+        put  = ''
+        put  = 'using namespace std;'
+        put  = ''
+        put  = 'int main()'
+        put  = '{'
+        put  = '    cout<<\"hello\"<<endl;'
+        put  = '}'
+    elseif &filetype == "java"
+        let class_name = substitute(bufname('%'),'\.java$','','g')
+        put! = ''
+        put  = 'public class '.class_name.' {'
+        put  = '    public static void main(String[] args) {'
+        put  = '        System.out.println(\"hello\");'
+        put  = '    }'
+        put  = '}'
+    elseif &filetype == "tex"
+        put! = '\documentclass{article}'
+        put  = '\usepackage[utf-8]{inputenc}'
+        put  = ''
+        put  = '\author{Csaba Hoch}'
+        put  = '\title{todo}'
+        put  = ''
+        put  = '\begin{document}'
+        put  = '  \maketitle'
+        put  = ''
+        put  = '\end{document}'
+    elseif &filetype == "sh"
+        put! = '#!/bin/bash'
+        put  = ''
+    elseif &filetype == "python"
+        put! = '#!/usr/bin/python'
+        put  = ''
+    elseif &filetype == "perl"
+        put! = '#!/usr/bin/perl'
+        put  = ''
+    endif
+endfunction
+
+command! HT :call HTemplate()
+

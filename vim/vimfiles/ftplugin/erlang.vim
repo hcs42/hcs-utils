@@ -14,4 +14,6 @@ let b:did_ftplugin = 1
 " Set 'formatoptions' to break comment lines but not other lines,
 " and insert the comment leader when hitting <CR> or using "o".
 setlocal fo-=t fo+=croql
-
+setlocal comments=n:%
+setlocal tw=80
+noremap <buffer> gD /^<c-r>=expand('<cword>')<cr>\><cr>
