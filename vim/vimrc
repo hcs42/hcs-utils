@@ -2,7 +2,7 @@
 " Settings "
 " -------- "
 
-set nocompatible                " I don't need the vi bugs
+set nocompatible " I don't need the vi bugs
 set backupskip=/tmp/*
 set lazyredraw
 set hidden
@@ -10,7 +10,7 @@ set kp=
 set nostartofline
 set laststatus=2
 set noswapfile
-set complete=.,w
+"set complete=.,w  " only when often using many windows
 set notimeout
 set ttimeout
 set ignorecase smartcase
@@ -38,6 +38,7 @@ set linebreak
 set suffixes+=.beam,.pyc        " these files should have lower priority then the others
 set nojoinspaces
 set nrformats=hex
+set encoding=utf-8
 
 if version >= 700
     set number
@@ -51,50 +52,80 @@ endif
 set guicursor=n-v:block-Cursor/lCursor-blinkwait9999-blinkoff9999-blinkon0,ve:ver35-Cursor,o:hor50-Cursor,i-ci-c:ver25-Cursor/lCursor-blinkwait9999-blinkoff9999-blinkon0,r-cr:hor20-Cursor/lCursor-blinkwait9999-blinkoff9999-blinkon0,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
 let g:is_bash = 1
 
-if has('persistent_undo')
-    if finddir("/a/_/folders/vim_undodir") != ""
-        se undofile
-        se undodir=/a/_/folders/vim_undodir
-    endif
-endif
+" ------------ "
+" Autocommands "
+" ------------ "
+
+" When editing a file, always jump to the last known cursor position.
+" Don't do it when the position is invalid or when inside an event handler
+" (happens when dropping a file on gvim).
+
+autocmd BufReadPost *
+            \ if line("'\"") > 0 && line("'\"") <= line("$") |
+            \   exe "normal! g`\"" |
+            \ endif
+
+" --------- "
+" Filetypes "
+" --------- "
+
+filetype plugin indent on
+syntax on
+colorscheme default
 
 " -------- "
 " Mappings "
 " -------- "
 
-noremap <F1>  :make <bar> cw<cr>
-noremap <F4>  @q
+noremap <F1> :make <bar> cw<cr>
+noremap <F4> @q
 noremap <F11> mkHmlggg?G`lzt`k
 noremap <F12> :syntax sync fromstart<cr>
 
-imap <F1>   <esc><F1>
-imap <F2>   <esc><F2>
-imap <F3>   <esc><F3>
-imap <F4>   <esc><F4>
-imap <F5>   <esc><F5>
-imap <F6>   <esc><F6>
-imap <F7>   <esc><F7>
-imap <F8>   <esc><F8>
-imap <F9>   <esc><F9>
-imap <F10>   <esc><F10>
-imap <F11>   <esc><F11>
-imap <F12>   <esc><F12>
+imap <F1> <esc><F1>
+imap <F2> <esc><F2>
+imap <F3> <esc><F3>
+imap <F4> <esc><F4>
+imap <F5> <esc><F5>
+imap <F6> <esc><F6>
+imap <F7> <esc><F7>
+imap <F8> <esc><F8>
+imap <F9> <esc><F9>
+imap <F10> <esc><F10>
+imap <F11> <esc><F11>
+imap <F12> <esc><F12>
 
-noremap - /
+noremap <a-left> :update<cr>:prev<cr>
+noremap <a-right> :update<cr>:next<cr>
 noremap ,<cr> :%s/<c-v><cr>/<cr>
 noremap <s-PageUp> <c-w><up>
 noremap <s-PageDown> <c-w><down>
 noremap ,vm :so $MYVIMRC<cr>
 imap <c-space> <space><space><space><space>
-vnoremap ,cw :<c-u>%s/<c-r>*/<c-r>*/g<left><left>
-noremap ,c*w :*s/\<<c-r>=expand("<cword>")<cr>\>/<c-r>=expand("<cword>")<cr>/g<left><left>
 cnoremap <c-s> \_s\+
 noremap <c-w>O :WinFullScreen<cr>
 noremap ,m `m
+nnoremap <up> g<up>
+nnoremap <down> g<down>
+nnoremap <c-j> <c-e>
+nnoremap <c-k> <c-y>
+nnoremap ,hw  :execute ":help " . expand("<cword>")<cr>
+
+" Mappings regarding settings
 noremap ,cl :set cul!<cr>
 noremap ,cc :set cuc!<cr>
 noremap ,cb :set cuc! cul!<cr>
+noremap ,nu :set number!<cr>
+noremap ,ro :set noro<cr>:set ma<cr>
+noremap ,wr :set wrap!<cr>
+noremap ,lb :set linebreak!<cr>
+noremap ,ws :set wrapscan!<cr>
+noremap ,SP :set spell spelllang=hu,en,de<cr>
+noremap ,S! :set spell!<cr>
+noremap ,l! :set list!<cr>
+noremap ,ti :let &titlestring = input("New title of the frame: ")<cr>
 
+" Mappings regarding copy-paste
 noremap ,d "+d
 noremap ,y "+y
 noremap ,p "+p
@@ -107,20 +138,24 @@ noremap ,,p "*p
 noremap ,,P "*P
 noremap ,,gp "*gp
 noremap ,,gP "*gP
-noremap ,<space> :%s/ \+$/<cr>
-nnoremap <up> g<up>
-nnoremap <down> g<down>
-nnoremap <c-j> <c-e>
-nnoremap <c-k> <c-y>
+noremap ,all mlHmkgg"+yG'kz<cr>`l
+noremap ,ad gg"_dG
 
-nnoremap ,*    :set hls<cr>:let @/="\\<<c-r><c-w>\\>"<cr>
-vnoremap ,*    :<del><del><del><del><del>set hls<cr>:let @/="\\<<c-r>*\\>"<cr>
-nnoremap ,,*   :set hls<cr>:let @/="\\c<c-r><c-w>"<cr>
-vnoremap ,,*   :<del><del><del><del><del>set hls<cr>:let @/="\\c<c-r>*"<cr>
-nnoremap ,v*   :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '<c-r>/'
-vnoremap ,v*   :<del><del><del><del><del>set hls<cr>:let @/="<c-r>*"<cr>:vim '<c-r>*'
-nnoremap ,vw*  :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '\<<c-r>/\>'
-nnoremap ,hw   :execute ":help " . expand("<cword>")<cr>
+" Mappings regarding search
+noremap - /
+nnoremap ,*   :set hls<cr>:let @/="\\<<c-r><c-w>\\>"<cr>
+vnoremap ,*   :<del><del><del><del><del>set hls<cr>:let @/="\\<<c-r>*\\>"<cr>
+nnoremap ,,*  :set hls<cr>:let @/="\\c<c-r><c-w>"<cr>
+vnoremap ,,*  :<del><del><del><del><del>set hls<cr>:let @/="\\c<c-r>*"<cr>
+nnoremap ,v*  :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '<c-r>/'
+vnoremap ,v*  :<del><del><del><del><del>set hls<cr>:let @/="<c-r>*"<cr>:vim '<c-r>*'
+nnoremap ,vw* :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '\<<c-r>/\>'
+
+" Mappings regarding search&replace
+nnoremap ,cw :%s/\<<c-r>=expand("<cword>")<cr>\>/<c-r>=expand("<cword>")<cr>/g<left><left>
+vnoremap ,cw :<c-u>%s/<c-r>*/<c-r>*/g<left><left>
+noremap ,c*w :*s/\<<c-r>=expand("<cword>")<cr>\>/<c-r>=expand("<cword>")<cr>/g<left><left>
+noremap ,<space> :%s/ \+$/<cr>
 
 " -------------------------- "
 " Invoking external programs "
@@ -216,15 +251,6 @@ command! ViewOn2 call ViewOn2()
 command! ViewOff2 call ViewOff2()
 command! ViewOn call ViewOn()
 command! ViewOff call ViewOff()
-
-" ----- "
-" HSave "
-" ----- "
-
-" Makes up a temporary file name and saves the file there.
-
-"command! HSave w! `mktemp -p ~ vim.tmp.XXXXXXXX`
-"command! HSave w! `mktemp ~/vim--XXXXXXXX`
 
 " ------------ "
 " BufferOpener "
@@ -345,9 +371,9 @@ function! HRunFileIfExists(file) "{{{
     endif
 endfunction
 
-" ------------ "
-" Backup files "
-" ------------ "
+" --------------------- "
+" Backup files settings "
+" --------------------- "
 
 if v:version >= 700
     " If I have a /a/_/folders/vim_backup directory, let that be the backup
@@ -371,6 +397,17 @@ function! HRefreshBackup()
 endfunction
 
 au BufWritePre * call HRefreshBackup()
+
+" ------------- "
+" Undo settings "
+" ------------- "
+
+if has('persistent_undo')
+    if exists("g:hcs_undodir")
+        se undofile
+        let &undodir = g:hcs_undodir
+    endif
+endif
 
 " ---------- "
 " Navigation "
