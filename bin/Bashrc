@@ -1,39 +1,5 @@
 #!/bin/bash
 
-# My .bashrc
-
-##### Computer dependent stuff #####
-
-case $comp in
-
-    giskard)
-
-        function DVI
-        {
-            kdvi "$@" >/dev/null 2>/dev/null &
-        }
-
-        function PDF
-        {
-            okular "$@" >/dev/null 2>/dev/null &
-        }
-
-        function PS
-        {
-            kghostview "$@" >/dev/null 2>/dev/null &
-        }
-
-        alias mp="mplayer -fs"
-        ;;
-    *)
-        function PDF
-        {
-            evince "$@" >/dev/null 2>/dev/null &
-        }
-        alias mp="mplayer -fs"
-        ;;
-esac
-
 ##### settings #####
 
 if [ "$EDITOR" = "" ]
@@ -79,6 +45,10 @@ alias gvmi='gvim'
 alias gerp='grep'
 alias grpe='grep'
 alias l='Catless'
+alias mp="mplayer -fs"
+alias WP="WaitProcess -n"
+alias V="Video -g"
+alias ssh="ssh -X"
 
 ##### git #####
 
@@ -301,27 +271,6 @@ then
     p3
 fi
 
-##### emacs #####
-
-function em
-{
-    emacs --no-splash "$@" >/dev/null 2>/dev/null &
-}
-
-##### apt #####
-
-function AI
-{
-    sudo apt-get install $*
-}
-
-alias AS='apt-cache search'
-
-function ASG
-{
-    apt-cache search "$1" | $VIM -
-}
-
 ##### directory/file handling #####
 
 function Cd
@@ -330,24 +279,8 @@ function Cd
     cd "$1"
 }
 
-function CD
-{
-    mkdir -p "$1"
-    cd "$1"
-}
-
-function LN
-    # $1: link or directory name
-    # $2: target
-{
-    ln -s "$2" "$1"
-}
-
+alias CD="Cd"
 alias d=". CdLs"
-#function d
-#{
-#    . CdLs "$@"
-#}
 
 ##### GW #####
 
@@ -377,14 +310,6 @@ function DW
 
 complete -o default -c GW
 complete -o default -c DW
-
-##### note #####
-
-function note
-{
-    echo Note for `pwd`
-    echo "$@" >> note
-}
 
 ##### hcshelp #####
 
@@ -484,106 +409,6 @@ if [ -f "$dirs_txt" ]; then
     . /a/docs/hcs/comp/hcs_help/dirs.txt
 fi
 
-alias -- "--"=d
-
-##### clipboard #####
-
-# putting the argument to the clipboard
-function C()
-{
-    case $desktop_manager in
-        kde4)
-            #dcop klipper klipper setClipboardContents "$1"
-            dbus-send --type=method_call --dest=org.kde.klipper \
-                 /klipper org.kde.klipper.klipper.setClipboardContents \
-                 string:"$1"
-            ;;
-        kde3)
-            dcop klipper klipper setClipboardContents "$1"
-            ;;
-        *)
-            echo Command is not available.
-            ;;
-    esac
-}
-
-# putting the content of a file to the clipboard
-function CF()
-{
-    case $desktop_manager in
-        kde4)
-            dbus-send --type=method_call --dest=org.kde.klipper \
-                 /klipper org.kde.klipper.klipper.setClipboardContents \
-                 string:"`cat $1`"
-            ;;
-        kde3)
-            dcop klipper klipper setClipboardContents "`cat $1`"
-            ;;
-        *)
-            echo Command is not available.
-            ;;
-    esac
-}
-
-# putting the path to the clipboard
-function CP()
-{
-    case $desktop_manager in
-        kde4)
-            dbus-send --type=method_call --dest=org.kde.klipper \
-                 /klipper org.kde.klipper.klipper.setClipboardContents \
-                 string:"`pwd`"
-            ;;
-        kde3)
-            dcop klipper klipper setClipboardContents "`pwd`"
-            ;;
-        *)
-            echo Command is not available.
-            ;;
-    esac
-}
-
-#function myxclipboard
-#{
-#    xclip_cmd="xclip $1"
-#    if [ "$2" != "" ]
-#    then
-#        echo -n "$2" | $xclip_cmd
-#    else
-#        $xclip_cmd
-#    fi
-#}
-#
-#function XC1
-#{
-#    myxclipboard "" "$1"
-#}
-#
-#function XC
-#{
-#    myxclipboard "-selection clipboard" "$1"
-#}
-
-# calls xclip normally
-function XC
-{
-    xclip -selection clipboard "$@"
-}
-
-# prints the contents of the clipboard
-function XP
-{
-    (xclip -selection clipboard -o "$@"; echo) | Catless
-}
-
-# feeds its argument to xclip
-function XA
-{
-    text="$1"
-    shift
-    echo -n "$text" | xclip -selection clipboard "$@"
-}
-
 ##### editing bashrc #####
 
 function EB()
@@ -596,23 +421,6 @@ function B()
 {
     . ~/.bashrc
 }
-
-##### aliases #####
-
-alias If=/sbin/ifconfig
-alias IF="/sbin/ifconfig | grep 192.168.1.10"
-alias U="unison -auto d"
-alias MNT_vali="sshfs hoch@vali.inf.elte.hu:/ /a/x/vali"
-alias UMNT_vali="fusermount -u /a/x/vali"
-alias MNT_doc2="sshfs hoch@doc2.inf.elte.hu:/home /a/x/doc2 && cd /a/x/doc2"
-alias UMNT_doc2="fusermount -u /a/x/doc2"
-alias TEA="SLEEP 2 && SOUND"
-alias WP="WaitProcess -n"
-alias V="Video -g"
-alias VNC="vncviewer 192.168.0.3:3"
-alias FAH="cd /a/comp/programs/fah; ./fah6"
-alias ssh="ssh -X"
-alias x="xmessage -file ~/.bashrc -nearmouse"
 
 ##### tail #####
 
@@ -654,17 +462,8 @@ function grep_acc
     grep "$@" "^[][(){}@#,+$~'\"[:space:]=./_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-]*$"
 }
 
-function Find1
+function AI
 {
-    find -L -name "$@" | sed 1q
+    sudo apt-get install "$@"
 }
 
-function lt
-{
-    ls -lt "$@" | head
-}
-
-function DelPyc
-{
-    find -name '*.pyc' | xargs t
-}
