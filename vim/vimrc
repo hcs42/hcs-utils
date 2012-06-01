@@ -152,7 +152,7 @@ noremap ,ad gg"_dG
 noremap - /
 nnoremap ,*   :set hls<cr>:let @/="\\<<c-r><c-w>\\>"<cr>
 vnoremap ,*   :<del><del><del><del><del>set hls<cr>:let @/="\\<<c-r>*\\>"<cr>
-nnoremap ,,*  :set hls<cr>:let @/="\\c<c-r><c-w>"<cr>
+nnoremap ,,*  :set hls<cr>:let @/="<c-r><c-w>\\c"<cr>
 vnoremap ,,*  :<del><del><del><del><del>set hls<cr>:let @/="\\c<c-r>*"<cr>
 nnoremap ,v*  :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '<c-r>/'
 vnoremap ,v*  :<del><del><del><del><del>set hls<cr>:let @/="<c-r>*"<cr>:vim '<c-r>*'
@@ -254,6 +254,7 @@ let MRU_Max_Entries = 100
 command! FileNameToClipboard let @+=expand('%:p') | let @*=@+
 command! PathToClipboard let @+=expand('%:p:h') | let @*=@+
 command! PureFileNameToClipboard let @+=expand('%:t') | let @*=@+
+command! ModuleNameToClipboard let @+=expand('%:t:r') | let @*=@+
 
 " -------------------------------- "
 " Executing Vim code in the buffer "
@@ -470,3 +471,9 @@ endfunction
 
 command! HT :call HTemplate()
 
+" ---------------------------------------------------------- "
+" Conversion between camelcase and underscore variable names "
+" ---------------------------------------------------------- "
+
+command! -range CamelToUnderscore silent <line1>,<line2>s/[a-z0-9]\@<=[A-Z]\|[[:alnum:]]\@<=[A-Z][a-z]\@=/_&/g | <line1>,<line2>s/.*/\L&/g | noh
+command! -range UnderscoreToCamel silent <line1>,<line2>s/\(\<\|_\)\([[:alnum:]]\)/\u\2/g | noh
