@@ -28,6 +28,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import urllib.request
 
 
@@ -168,7 +169,21 @@ def get_mr1_time(month, day, hour, minute, length, mp3_name):
     url = ("http://stream001.radio.hu:443/stream/%s%s%s_%s%.2d00_1.mp3" %
            (year, month, day, hour, minute))
     print('url: ' + url)
-    get_url(url, mp3_name, max_kb)
+
+    i = 0
+    while True:
+        try:
+            get_url(url, mp3_name, max_kb)
+            break
+        except Exception, e:
+            print "Exception during get_mr1_time:", e
+            if i < 10:
+                print "Sleeping 1 minute and trying again."
+                i += 1
+                time.sleep(60)
+            else:
+                print "Giving up."
+                break
 
 def call_cut(mp3name, from_='0:0', to='999:0'):
     tmpfile = gettempfile()
