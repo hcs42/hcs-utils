@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # Prints a sequence of days in the following format:
-# == 2010-09-28 (w38 v) ==
+# ## 2010-09-28 (w38 v)
 
 sub print_help() {
     print <<EOF
@@ -12,7 +12,7 @@ USAGE
 DESCRIPTION
     Prints a sequence of days in the following format:
 
-        == 2010-09-28 (w38 v) ==
+        ## 2010-09-28 (w38 v)
 OPTIONS
     -h, --help          This help
 EOF
@@ -48,7 +48,7 @@ sub main() {
     while($i < 30) {
         my $ts = ymd_to_localtime($year, $month, $day);
         my $dayname = dayname($ts);
-        print strftime "== %Y-%m-%d (w%V " . $dayname. ") ==\n", @$ts;
+        print strftime "## %Y-%m-%d (w%V " . $dayname. ")\n", @$ts;
         $day++;
         $i++;
     }
