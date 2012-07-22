@@ -13,6 +13,9 @@ def parse_args():
                       help='Battery name. You can find it out by doing '
                            '`ls /proc/acpi/battery/`.',
                       action='store', default='BAT0')
+    parser.add_option('-p', '--percentage', dest='percentage',
+                      help='Print only the percentage as a number.',
+                      action='store_true', default=False)
     parser.add_option('-v', '--verbose', dest='verbose',
                       help='Verbose output',
                       action='store_true', default=False)
@@ -61,8 +64,13 @@ def main(options, args):
 
     remaining_hour_int = (int(remaining_min) / 60)
     remaining_min_int = (int(remaining_min) % 60)
-    print 'Remaining time: %0.2d:%0.2d' % (remaining_hour_int, remaining_min_int)
-    print 'Percentage: %0.2d%%' % (int(remaining_cap / max_cap * 100),)
+    percentage = int(remaining_cap / max_cap * 100)
+
+    if options.percentage:
+        print percentage
+    else:
+        print 'Remaining time: %0.2d:%0.2d' % (remaining_hour_int, remaining_min_int)
+        print 'Percentage: %0.2d%%' % (percentage,)
 
 if __name__ == '__main__':
     main(*parse_args())
