@@ -22,8 +22,8 @@
 " -------- "
 
 noremap é :
-noremap Ű <c-6>
-noremap ű <c-^>
+noremap ú <c-^>
+noremap ű <c-]>
 
 " ------------------- "
 " Converter functions "

@@ -163,6 +163,7 @@ nnoremap ,cw :%s/\<<c-r>=expand("<cword>")<cr>\>/<c-r>=expand("<cword>")<cr>/g<l
 vnoremap ,cw :<c-u>%s/<c-r>*/<c-r>*/g<left><left>
 noremap ,c*w :*s/\<<c-r>=expand("<cword>")<cr>\>/<c-r>=expand("<cword>")<cr>/g<left><left>
 noremap ,<space> :%s/ \+$/<cr>
+noremap ,<cr> :%s/<c-v><cr>/<cr>
 
 " Unmap confusing commands
 noremap Q <nop>
