@@ -52,7 +52,7 @@ def main():
         temp = os.fdopen(temp, 'w')
         print_file(temp.write)
         temp.close()
-        subprocess.call(['gvim', '-f', tempname])
+        subprocess.call(['vim', '-f', tempname])
         subprocess.call(['bash', tempname])
     except KeyboardInterrupt:
         pass
