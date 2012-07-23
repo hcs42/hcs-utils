@@ -70,6 +70,7 @@ def call(cmd):
 
 join = os.path.join
 year = datetime.datetime.today().year
+# year = 2011
 podcast_dir = '/a/media/audio/flash'
 podcast_log = '/home/hcs/podcast_log'
 
