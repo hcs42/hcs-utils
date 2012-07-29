@@ -156,6 +156,10 @@ def get_url(url, filename, max_kb):
     kb = 0
     for i in range(max_kb // quantum):
         s = f.read(quantum * 1024)
+        if len(s) == 0:
+            class E(Exception):
+                pass
+            raise E()
         g.write(s)
         kb += quantum
         dt_str = datetime.datetime.now().strftime("%H:%M:%S")
@@ -176,14 +180,14 @@ def get_mr1_time(month, day, hour, minute, length, mp3_name):
         try:
             get_url(url, mp3_name, max_kb)
             break
-        except Exception, e:
-            print "Exception during get_mr1_time:", e
+        except Exception as e:
+            print("Exception during get_mr1_time:" + str(e))
             if i < 10:
-                print "Sleeping 1 minute and trying again."
+                print("Sleeping 1 minute and trying again.")
                 i += 1
                 time.sleep(60)
             else:
-                print "Giving up."
+                print("Giving up.")
                 break
 
 def call_cut(mp3name, from_='0:0', to='999:0'):
