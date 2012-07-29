@@ -58,7 +58,10 @@ def main(options, args):
 
     present_rate = float(get_int('present rate', state))
     remaining_cap = float(get_int('remaining capacity', state))
-    remaining_hour = remaining_cap / present_rate
+    if present_rate == 0:
+        remaining_hour = 0
+    else:
+        remaining_hour = remaining_cap / present_rate
     remaining_min = int(remaining_hour * 60)
     max_cap = float(get_int('last full capacity', info))
 
