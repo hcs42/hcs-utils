@@ -1,0 +1,126 @@
+#!/usr/bin/python
+
+from __future__ import with_statement
+import optparse
+import os
+import re
+import subprocess
+import sys
+import urllib2
+import datetime
+
+def call(cmd):
+    w = sys.stdout.write
+    w('cmd: ')
+
+    for arg in cmd:
+        # we put `arg` between quotes if contains any character like space that
+        # is not mentioned here
+        if re.match('^[-_a-zA-Z0-9./+=:]+$', arg):
+            w(arg)
+        else:
+            w("'%s'" % arg)
+        w(' ')
+    w('\n')
+    subprocess.call(cmd)
+
+def error(s):
+    sys.stderr.write(s + '\n')
+    sys.exit(1)
+
+def read_lines(fname):
+    lines = []
+    with open(fname) as f:
+        for line in f:
+            line = line.strip()
+            if line == '' or line[0] == '#':
+                continue
+            lines.append(line)
+    return lines
+
+def get_top_items(list_pages):
+    top_items = set([])
+    for list_page in list_pages:
+        for line in urllib2.urlopen(list_page).read().splitlines():
+            r = re.search(r'media_id=(\d+).*play', line)
+            if r:
+                top_items.add(r.group(1))
+    return sorted(top_items)
+
+def download_item(item, options):
+    # item example: 54123
+    hash = str(int(item[0]) + 1)
+    url = 'video.mno.hu/data/videos/final/' + hash + '/' + item + '/' + item + '_wvga.flv'
+    output_fname = os.path.join(options.output_dir, item)
+#    call(['wget', url, '-O', output_fname + '.flv'])
+#    call(['ffmpeg',
+#          '-i', output_fname + '.flv', '-ab', '128k', '-ac', '1',
+#          output_fname + '.mp3'])
+#    os.remove(output_fname + '.flv')
+
+def add_item_to_downloaded_items(item, downloaded_items_file):
+    with open(downloaded_items_file, 'a') as f:
+        f.write(item + '\n')
+
+def merge_items(items, options):
+    d = {}
+    print items
+    for item in items:
+        fname = item + '.mp3'
+        descr = subprocess.Popen(['file', fname], stdout=subprocess.PIPE).communicate()[0]
+        d.setdefault(descr, []).append(fname)
+    for i, fname_list in enumerate(d.values()):
+        today = datetime.date.today().strftime('%m%d')
+        merged_basename = '%s-hirtv-%s.mp3' % (today, i + 1)
+        merged_fname = os.path.join(options.output_dir, merged_basename)
+        call(['sox'] + fname_list + [merged_fname])
+        for fname in fname_list:
+            os.remove(fname)
+
+def parse_args():
+    usage = ('Usage: GetHirtv [options]\n'
+             'Description: downloads stuff from hirtv')
+    parser = optparse.OptionParser(usage=usage)
+
+    parser.add_option('--reset', dest='reset',
+                      help='',
+                      action='store_true', default=False)
+    parser.add_option('--list-pages-file', dest='list_pages_file',
+                      help='',
+                      action='store', default='list_pages_file')
+    parser.add_option('--downloaded-items-file', dest='downloaded_items_file',
+                      help='',
+                      action='store', default='downloaded_items_file')
+    parser.add_option('--output-dir', dest='output_dir',
+                      help='',
+                      action='store', default='.')
+    parser.add_option('-v', '--verbose', dest='verbose',
+                      help='Verbose output',
+                      action='store_true', default=False)
+
+    (cmdl_options, args) = parser.parse_args()
+    return cmdl_options, args
+
+def main(options, args):
+
+    os.chdir(options.output_dir)
+    list_pages = sorted(read_lines(options.list_pages_file))
+
+    try:
+        downloaded_items = set(read_lines(options.downloaded_items_file))
+    except IOError, e:
+        downloaded_items = set([])
+
+    top_items = get_top_items(list_pages)
+    new_items = [item for item in top_items
+                      if item not in downloaded_items]
+    for item in new_items:
+        if not options.reset:
+            download_item(item, options)
+        add_item_to_downloaded_items(item, options.downloaded_items_file)
+    if not options.reset:
+        merge_items(new_items, options)
+    
+
+if __name__ == '__main__':
+    main(*parse_args())
