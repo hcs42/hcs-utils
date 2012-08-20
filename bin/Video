@@ -244,11 +244,11 @@ def play(od):
                 elif start_pos != 0:
                     options += ['-ss',start_pos]
                 if od['hide-mplayer-output']:
-                    call(['MP']+options+[track],
+                    call(['mplayer']+options+[track],
                          stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w'))
                 else:
-                    print('+ ', ['MP']+options+[track])
-                    call(['MP']+options+[track])
+                    print('+ ', ['mplayer']+options+[track])
+                    call(['mplayer']+options+[track])
             if os.path.exists('donotstop') and playnum != None:
                 add_pnum(1)
                 del_ppos()
