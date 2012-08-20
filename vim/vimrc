@@ -245,6 +245,7 @@ endfunction
 
 command! -nargs=? MS call HMEFunction("<args>",1)
 command! -nargs=? ME call HMEFunction("<args>",0)
+command! -nargs=? E call HMEFunction("<args>",0)
 
 let MRU_Max_Entries = 100
 
