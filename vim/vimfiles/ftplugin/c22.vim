@@ -6,27 +6,27 @@ function! Contains(list, item)
     return index(a:list, a:item) != -1
 endfunction
 
-let g:catch22_lookups = ['longman']
-let g:catch22_all_lookups = ['longman', 'wp']
+let g:c22_lookups = ['longman']
+let g:c22_all_lookups = ['longman', 'wp']
 
 function! LookupAdd(item)
-    if Contains(g:catch22_all_lookups, a:item)
-        call add(g:catch22_lookups, a:item)
+    if Contains(g:c22_all_lookups, a:item)
+        call add(g:c22_lookups, a:item)
     else
         echo "The given item is not a lookup item!"
     endif
 endfunction
 
 function! LookupDel(item)
-    call remove(g:catch22_lookups, index(g:catch22_lookups, a:item))
+    call remove(g:c22_lookups, index(g:c22_lookups, a:item))
 endfunction
 
-command! -nargs=0 LookupShow echo g:catch22_lookups
-command! -nargs=0 LookupShowAll echo g:catch22_all_lookups
+command! -nargs=0 LookupShow echo g:c22_lookups
+command! -nargs=0 LookupShowAll echo g:c22_all_lookups
 command! -nargs=1 LookupAdd call LookupAdd('<args>')
 command! -nargs=1 LookupDel call LookupDel('<args>')
-command! -nargs=0 LookupAddAll let g:catch22_lookups = g:catch22_all_lookups
-command! -nargs=0 LookupDelAll let g:catch22_lookups = []
+command! -nargs=0 LookupAddAll let g:c22_lookups = g:c22_all_lookups
+command! -nargs=0 LookupDelAll let g:c22_lookups = []
 
 noremap Ő :LookupShow<cr>
 noremap Ú :LookupShowAll<cr>
@@ -46,10 +46,10 @@ function! AddWord(mode)
     let @+ = @"
     let @/ = @"
     let @" = substitute(@", ' ', '\\%20', 'g')
-    if Contains(g:catch22_lookups, 'wp')
+    if Contains(g:c22_lookups, 'wp')
         exec ":!chromium-browser http://en.wikipedia.org/w/index.php?search=" . @"
     endif
-    if Contains(g:catch22_lookups, 'longman')
+    if Contains(g:c22_lookups, 'longman')
         exec ":!chromium-browser http://www.ldoceonline.com/search/?q=" . @"
     endif
     set hls
