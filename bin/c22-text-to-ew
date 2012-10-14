@@ -1,0 +1,161 @@
+#!/usr/bin/python3
+
+
+import optparse
+import re
+import sys
+
+
+# Returns the average of the given values, rounded to 2 decimals
+def avg(values):
+    return round(sum(values) / len(values), 2)
+
+
+def convert(input_fname, output_fname, options):
+
+    # Create page reference template
+    if options.title is not None:
+        if options.page:
+            page_ref_templ = ' (' + options.title + ', page %s)'
+        else:
+            page_ref_templ = ' (' + options.title + ')'
+    else:
+        if options.page:
+            page_ref_templ = ' (page %s)'
+        else:
+            page_ref_templ = ''
+        
+    # Writes a word pair if there is one to be written
+    def flush_word_pair():
+        nonlocal word_pair
+        nonlocal sentence
+        nonlocal examples
+        if word_pair:
+            page_ref = page_ref_templ % page_str if options.page else page_ref_templ
+            f2.write(word_pair + '\n' +
+                     '    ' + sentence + page_ref + '\n')
+            if examples != '':
+                f2.write('\n')
+                f2.write(examples)
+            f2.write('\n')
+        word_pair = None
+        examples = ''
+
+    # Loop variables
+    f = open(input_fname)
+    f2 = open(output_fname, 'w')
+    word_pair = None
+    sentence = None
+    examples = ''
+    page = 1
+    page_str = ''
+    last_page = 1
+    page_to_new_word_count = {}
+    i = 0
+
+    while True:
+
+        i += 1
+        line = f.readline()
+
+        # End of text
+        if line == '':
+            break
+
+        line = line.rstrip()
+
+        # Empty line (or line containing only '>' symbols)
+        if re.match('^>*$', line):
+            continue
+
+        # Page number
+        r = re.search('^-- (.*) --$', line)
+        if r:
+            page_str = r.group(1)
+            try:
+                page = int(page_str)
+            except ValueError:
+                pass
+            continue
+
+        # Other special thingie
+        r = re.search('^--- ', line)
+        if r:
+            continue
+
+        # Sentence
+        r = re.search('^>+ (.*)', line)
+        if r:
+            flush_word_pair()
+            sentence = r.group(1)
+            continue
+
+        # Word that I don't know what meant
+        r = re.search(r' -- \?$', line)
+        if r:
+            page_to_new_word_count.setdefault(page, 0)
+            page_to_new_word_count[page] += 1
+            last_page = page
+            continue
+
+        # Word pair
+        r = re.search('^(.* -- .*)$', line)
+        if r:
+            flush_word_pair()
+            word_pair = r.group(1)
+            page_to_new_word_count.setdefault(page, 0)
+            page_to_new_word_count[page] += 1
+            last_page = page
+            continue
+
+        # Example
+        r = re.search('^(    .*)$', line)
+        if r:
+            examples += r.group(1) + '\n'
+            continue
+
+        sys.stderr.write("Format error in line %s: %s\n" % (i, line))
+        sys.exit(1)
+
+    flush_word_pair()
+    f.close()
+    f2.close()
+
+    # Statistics
+    word_counts = \
+        [page_to_new_word_count.get(i, 0)
+         for i in range(1, last_page + 1)]
+
+    print('Sum:', sum(word_counts))
+    print('Average:', avg(word_counts))
+
+    print('Average for ten-page blocks:')
+    i = 0
+    while i < len(word_counts):
+        print('Page %s-%s: %s' % (i + 1, i + 10, avg(word_counts[i:(i + 9)])))
+        i += 10
+
+def parse_args():
+    usage = ('Usage: c22-text-to-ew [options] INPUT_FILE OUTPUT_FILE\n'
+             'Description: converts a text in C22 format to ExponWords format')
+    parser = optparse.OptionParser(usage=usage)
+
+    parser.add_option('-t', '--title', dest='title',
+                      help='The title of the text.',
+                      action='store', default=None)
+    parser.add_option('--nopage', dest='page',
+                      help='Do not show page numbers',
+                      action='store_false', default=True)
+
+    (cmdl_options, args) = parser.parse_args()
+    return cmdl_options, args
+
+def main(options, args):
+    if len(args) != 2:
+        print('Wrong arguments! Use --help.')
+        sys.exit(1)
+    convert(args[0], args[1], options)
+
+if __name__ == '__main__':
+    main(*parse_args())
+
