@@ -38,7 +38,12 @@ noremap ől :LookupAdd longman<cr>
 noremap úl :LookupDel longman<cr>
 
 function! AddWord(mode)
-    /^>
+    " If we are in the last line of the text, add an extra line
+    if line('.') == line('$')
+        call append('$', '')
+    endif
+
+    /^\(>\|$\)
     normal O
     normal P
     normal A -- 
