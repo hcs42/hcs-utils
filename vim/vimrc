@@ -41,7 +41,7 @@ set linebreak
 set suffixes+=.beam,.pyc        " these files should have lower priority then the others
 set nojoinspaces
 set nrformats=hex
-set encoding=utf-8
+"set encoding=utf-8
 set spellcapcheck=
 
 if version >= 700
@@ -163,7 +163,7 @@ nnoremap ,vw* :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '\<<c-r>/\>'
 nnoremap ,cw :%s/\<<c-r>=expand("<cword>")<cr>\>/<c-r>=expand("<cword>")<cr>/g<left><left>
 vnoremap ,cw :<c-u>%s/<c-r>*/<c-r>*/g<left><left>
 noremap ,c*w :*s/\<<c-r>=expand("<cword>")<cr>\>/<c-r>=expand("<cword>")<cr>/g<left><left>
-noremap ,<space> :%s/ \+$/<cr>
+noremap ,<space> :%s/\s\+$/<cr>
 noremap ,<cr> :%s/<c-v><cr>/<cr>
 
 " Unmap confusing commands
