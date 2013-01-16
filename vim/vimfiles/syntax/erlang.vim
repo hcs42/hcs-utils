@@ -45,7 +45,7 @@ if ! exists ("erlang_characters")
     syn match   erlangSpecialCharacter ":\|_\|@\|\\\|\"\|\."
     syn match   erlangSeparator        "(\|)\|{\|}\|\[\|]\||\|||\|;\|,\|?\|->\|#" contained
     syn region  erlangString           start=+"+ skip=+\\.+ end=+"+ contains=erlangModifier
-    syn region  erlangAtom             start=+'+ skip=+\\'+ end=+'+
+    syn region  erlangAtom             start=+'+ skip=+\\.+ end=+'+
 
     " Operators
     syn match   erlangOperator         "+\|-\|\*\|\/"
@@ -64,7 +64,7 @@ if ! exists ("erlang_characters")
     " Ignore '_' and '-' in words
     syn match   erlangWord             "\h\+\w*"
 
-    syn match   erlangChar             /\$./
+    syn match   erlangChar             /\$\(\\.\|[^\\]\)/
 endif
 
 if ! exists ("erlang_functions")
