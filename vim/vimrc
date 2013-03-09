@@ -43,6 +43,7 @@ set nojoinspaces
 set nrformats=hex
 "set encoding=utf-8
 set spellcapcheck=
+set isfname-==
 
 if version >= 700
     set number
@@ -111,6 +112,8 @@ noremap <c-w>O :WinFullScreen<cr>
 noremap ,m `m
 nnoremap <up> g<up>
 nnoremap <down> g<down>
+vnoremap <up> g<up>
+vnoremap <down> g<down>
 nnoremap <c-j> <c-e>
 nnoremap <c-k> <c-y>
 nnoremap ,hw  :execute ":help " . expand("<cword>")<cr>
