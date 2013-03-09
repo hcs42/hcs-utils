@@ -47,9 +47,7 @@ function! AddWord(mode)
     normal O
     normal P
     normal A -- 
-    let @* = @"
-    let @+ = @"
-    let @/ = @"
+    let l:a = @"
     let @" = substitute(@", ' ', '\\%20', 'g')
     if Contains(g:c22_lookups, 'wp')
         exec ":!chromium-browser http://en.wikipedia.org/w/index.php?search=" . @"
@@ -58,6 +56,9 @@ function! AddWord(mode)
         exec ":!chromium-browser http://www.ldoceonline.com/search/?q=" . @"
     endif
     set hls
+    let @* = l:a
+    let @+ = l:a
+    let @/ = l:a
 endfunction
 
 vmap <buffer> <tab> mmy:call AddWord("visual")<cr><cr>:set hls<cr><cr>
@@ -81,6 +82,67 @@ endfunction
 noremap <buffer> ö :call C22Cleanup()<cr>
 noremap <buffer> á ?\<\(.*\) -- .*\1.*<cr>
 
+function! C22MultiMeaning()
+    let l:start_line = line("'<")
+    let l:end_line = line("'>")
+    echo l:start_line . ' ' . l:end_line
+    let l:current_line = start_line
+    let l:definitions = ''
+    let l:examples = ''
+    let l:new_def = 0
+    let l:first = 1
+
+    while l:current_line <= l:end_line
+        let l:line = getline(l:current_line)
+
+        " Handle the case where the first line contains the left side as well,
+        " for example:
+        "     dog -- 1 a well-known animal
+        if l:first
+            let l:first = 0
+            let l:ml = matchlist(l:line, '^\(.\{-}\) -- \(.*\)$')
+            if l:ml != []
+                let l:definitions = l:ml[1] . ' -- '
+                let l:line = l:ml[2]
+            endif
+        endif
+
+        " Remove starting white space
+        let l:line = substitute(l:line, '^\s\+', '', 'g')
+        let l:maybe_def_index = matchstr(l:line, '^\d\s\@=')
+        
+        if l:maybe_def_index != ''
+            " New definition.
+            " Example:
+            "   2 to give someone advice, an explanation etc
+            let l:def_index = l:maybe_def_index
+            let l:line = substitute(l:line, '^\(\d\)\s\+', '(\1) ', 'g')
+            if l:def_index != 1
+                let l:definitions .= ' '
+            endif
+            let l:definitions .= l:line
+            let l:new_def = 1
+        else
+            let l:examples .= '    '
+            if l:new_def
+                let l:examples .= '(' . l:def_index . ') '
+                let l:new_def = 0
+            endif
+            let l:examples .= l:line . "\n"
+        endif
+
+        let l:current_line += 1
+    endwhile
+
+    *delete
+    let @x = l:definitions . "\n" . l:examples
+    put! x
+    
+endfunction
+
+noremap <buffer> ű :call C22MultiMeaning()<cr>
+vnoremap <buffer> ű <esc>:call C22MultiMeaning()<cr>
+
 " ------------------------ "
 " Format the original text "
 " ------------------------ "
@@ -100,3 +162,4 @@ noremap <buffer> ü <esc>:call C22FormatOriginal()<cr>
 
 noremap <buffer> ó /^><cr>:nohls<cr>zz
 setlocal tw=999
+map Ű 0f,xxv/--<cr>hhdo    # <c-r>"<esc>k0:noh<cr>

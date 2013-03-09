@@ -16,12 +16,12 @@ def convert(input_fname, output_fname, options):
     # Create page reference template
     if options.title is not None:
         if options.page:
-            page_ref_templ = ' (' + options.title + ', page %s)'
+            page_ref_templ = ' (' + options.title + ', ' + options.page_word + '%s)'
         else:
             page_ref_templ = ' (' + options.title + ')'
     else:
         if options.page:
-            page_ref_templ = ' (page %s)'
+            page_ref_templ = ' (' + options.page_word + '%s)'
         else:
             page_ref_templ = ''
         
@@ -32,8 +32,9 @@ def convert(input_fname, output_fname, options):
         nonlocal examples
         if word_pair:
             page_ref = page_ref_templ % page_str if options.page else page_ref_templ
-            f2.write(word_pair + '\n' +
-                     '    ' + sentence + page_ref + '\n')
+            f2.write(word_pair)
+            if sentence is not None:
+                f2.write('\n    ' + sentence + page_ref + '\n')
             if examples != '':
                 f2.write('\n')
                 f2.write(examples)
@@ -78,6 +79,13 @@ def convert(input_fname, output_fname, options):
                 pass
             continue
 
+        # Clear sentence
+        r = re.search('^--- !clear sentence$', line)
+        if r:
+            flush_word_pair()
+            sentence = None
+            continue
+
         # Other special thingie
         r = re.search('^--- ', line)
         if r:
@@ -99,7 +107,7 @@ def convert(input_fname, output_fname, options):
             continue
 
         # Word pair
-        r = re.search('^(.* -- .*)$', line)
+        r = re.search(r'^([^\s].* -- .*)$', line)
         if r:
             flush_word_pair()
             word_pair = r.group(1)
@@ -140,6 +148,9 @@ def parse_args():
              'Description: converts a text in C22 format to ExponWords format')
     parser = optparse.OptionParser(usage=usage)
 
+    parser.add_option('--page-word', dest='page_word',
+                      help='The word to be used instead of "page".',
+                      action='store', default='page ')
     parser.add_option('-t', '--title', dest='title',
                       help='The title of the text.',
                       action='store', default=None)
