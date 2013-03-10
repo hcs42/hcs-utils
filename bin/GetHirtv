@@ -52,11 +52,11 @@ def download_item(item, options):
     hash = str(int(item[0]) + 1)
     url = 'video.mno.hu/data/videos/final/' + hash + '/' + item + '/' + item + '_wvga.flv'
     output_fname = os.path.join(options.output_dir, item)
-#    call(['wget', url, '-O', output_fname + '.flv'])
-#    call(['ffmpeg',
-#          '-i', output_fname + '.flv', '-ab', '128k', '-ac', '1',
-#          output_fname + '.mp3'])
-#    os.remove(output_fname + '.flv')
+    call(['wget', url, '-O', output_fname + '.flv'])
+    call(['ffmpeg',
+          '-i', output_fname + '.flv', '-ab', '128k', '-ac', '1',
+          output_fname + '.mp3'])
+    os.remove(output_fname + '.flv')
 
 def add_item_to_downloaded_items(item, downloaded_items_file):
     with open(downloaded_items_file, 'a') as f:
@@ -64,10 +64,11 @@ def add_item_to_downloaded_items(item, downloaded_items_file):
 
 def merge_items(items, options):
     d = {}
-    print items
+    print 'Merging the following items:', items
     for item in items:
         fname = item + '.mp3'
-        descr = subprocess.Popen(['file', fname], stdout=subprocess.PIPE).communicate()[0]
+        descr = subprocess.Popen(['file', '-b', fname],
+                                 stdout=subprocess.PIPE).communicate()[0]
         d.setdefault(descr, []).append(fname)
     for i, fname_list in enumerate(d.values()):
         today = datetime.date.today().strftime('%m%d')
@@ -76,6 +77,7 @@ def merge_items(items, options):
         call(['sox'] + fname_list + [merged_fname])
         for fname in fname_list:
             os.remove(fname)
+    print 'Merge finished'
 
 def parse_args():
     usage = ('Usage: GetHirtv [options]\n'
@@ -114,6 +116,7 @@ def main(options, args):
     top_items = get_top_items(list_pages)
     new_items = [item for item in top_items
                       if item not in downloaded_items]
+    print 'I found the following new items:', new_items
     for item in new_items:
         if not options.reset:
             download_item(item, options)

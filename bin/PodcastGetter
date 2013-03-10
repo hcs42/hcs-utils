@@ -179,13 +179,18 @@ def get_mr1_time(month, day, hour, minute, length, mp3_name):
     while True:
         try:
             get_url(url, mp3_name, max_kb)
+            print('Download successful after %s retries.' % i)
             break
         except Exception as e:
             print("Exception during get_mr1_time:" + str(e))
             if i < 10:
-                print("Sleeping 1 minute and trying again.")
+                print("Sleeping 2 minutes and trying again.")
                 i += 1
-                time.sleep(60)
+                time.sleep(120)
+            elif i < 20:
+                print("Sleeping 11 minutes and trying again.")
+                i += 1
+                time.sleep(660)
             else:
                 print("Giving up.")
                 break
