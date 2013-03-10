@@ -21,7 +21,7 @@
 " Mappings "
 " -------- "
 
-noremap é :
+noremap é :USE_THE_LAPTOP_LUKE!<space>
 noremap ú <c-^>
 noremap ű <c-]>
 

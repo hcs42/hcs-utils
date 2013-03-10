@@ -100,6 +100,9 @@ imap <F10> <esc><F10>
 imap <F11> <esc><F11>
 imap <F12> <esc><F12>
 
+noremap <space> :
+noremap : :USE_THE_LAPTOP_LUKE!<space>
+noremap <bs> :up<cr>
 noremap <a-left> :update<cr>:prev<cr>
 noremap <a-right> :update<cr>:next<cr>
 noremap ,<cr> :%s/<c-v><cr>/<cr>

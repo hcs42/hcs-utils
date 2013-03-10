@@ -478,3 +478,7 @@ function AI
     sudo apt-get install "$@"
 }
 
+function ss
+{
+    ssh -t "$@" "screen -dR csaba_hoch"
+}
