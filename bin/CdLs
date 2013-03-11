@@ -61,5 +61,10 @@ fi
 
 if $cont
 then
-    ls --color=auto
+    if [ "$OSTYPE" = darwin12 ]
+    then
+        ls
+    else
+        ls --color=auto
+    fi
 fi

@@ -402,7 +402,7 @@ function Helpfind
 
 function Helplist
 {
-    ls "$HCS_HELP_DIR_1"  "$HCS_HELP_DIR_2" | sed 's/\.htxt//g' | sed 's/\.txt//g'
+    \ls "$HCS_HELP_DIR_1"  "$HCS_HELP_DIR_2" | sed 's/\.htxt//g' | sed 's/\.txt//g'
 }
 
 ##### hcs dirs #####
