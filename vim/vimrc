@@ -158,11 +158,11 @@ noremap ,ad gg"_dG
 " Mappings regarding search
 noremap - /
 nnoremap ,*   :set hls<cr>:let @/="\\<<c-r><c-w>\\>"<cr>
-vnoremap ,*   :<del><del><del><del><del>set hls<cr>:let @/="\\<<c-r>*\\>"<cr>
+vnoremap ,*   :<c-u>set hls<cr>:let @/="\\<<c-r>*\\>"<cr>
 nnoremap ,,*  :set hls<cr>:let @/="<c-r><c-w>\\c"<cr>
-vnoremap ,,*  :<del><del><del><del><del>set hls<cr>:let @/="\\c<c-r>*"<cr>
+vnoremap ,,*  :<c-u>set hls<cr>:let @/="\\c<c-r>*"<cr>
 nnoremap ,v*  :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '<c-r>/'
-vnoremap ,v*  :<del><del><del><del><del>set hls<cr>:let @/="<c-r>*"<cr>:vim '<c-r>*'
+vnoremap ,v*  :<c-u>set hls<cr>:let @/="<c-r>*"<cr>:vim '<c-r>*'
 nnoremap ,vw* :set hls<cr>:let @/="<c-r><c-w>"<cr>:vim '\<<c-r>/\>'
 
 " Mappings regarding search&replace
