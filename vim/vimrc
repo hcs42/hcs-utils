@@ -124,6 +124,8 @@ noremap ,sy :echo synIDattr(synID(line('.'),col('.'),1),'name')<cr>
 noremap ,ft :setf <c-r>=&ft<cr><cr>
 noremap ,cd :exec "lcd ".expand('%:p:h')<cr>
 noremap ,CD :exec "cd ".expand('%:p:h')<cr>
+inoremap <bs> <c-g>u<bs>
+inoremap <c-w> <c-g>u<c-w>
 
 " Mappings regarding settings
 noremap ,cl :set cul!<cr>
